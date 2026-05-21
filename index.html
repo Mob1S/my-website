@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mob1S — Personal Homepage</title>
+  <link rel="stylesheet" href="style.css">
+  <script async src="https://unpkg.com/es-module-shims@1.10.0/dist/es-module-shims.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "animejs": "./anime-4.4.1/dist/bundles/anime.esm.min.js"
+      }
+    }
+  </script>
+</head>
+<body>
+  <canvas id="particle-canvas"></canvas>
+
+  <nav class="navbar">
+    <div class="nav-brand">MOB<span class="brand-accent">1S</span></div>
+    <div class="nav-links">
+      <a href="#hero" class="nav-link active">Home</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="#hobbies" class="nav-link">Hobbies</a>
+      <a href="#chat" class="nav-link">Mob1S AI</a>
+    </div>
+  </nav>
+
+  <main class="sections-container">
+
+    <!-- ==================== HERO ==================== -->
+    <section id="hero" class="section hero-section">
+      <div class="hero-content" data-parallax="0.4">
+        <div class="hero-badge">Mob1S</div>
+        <h1 class="hero-title">
+          <span class="title-line">HELLO, I'M</span>
+          <span class="title-line accent">MOB<span class="brand-accent">1S</span></span>
+        </h1>
+        <p class="hero-subtitle">Developer · Gamer · F1 Enthusiast</p>
+        <div class="hero-cta">
+          <button class="btn-primary" data-scroll-to="about">ABOUT ME</button>
+          <button class="btn-outline" data-scroll-to="hobbies">MY HOBBIES</button>
+          <button class="btn-outline" data-scroll-to="chat">TALK TO MOB1S AI</button>
+        </div>
+      </div>
+      <div class="scroll-indicator">
+        <span class="scroll-line"></span>
+        <span class="scroll-text">SCROLL</span>
+      </div>
+    </section>
+
+    <!-- ==================== ABOUT ME ==================== -->
+    <section id="about" class="section about-section">
+      <div class="section-content">
+        <h2 class="section-title" data-parallax="0.15">
+          <span class="section-number">01</span>
+          ABOUT ME
+        </h2>
+        <div class="about-grid">
+          <div class="about-text" data-parallax="0.1">
+            <!--
+              ==========================================
+              在这里编辑你的自我介绍
+              Edit your self-introduction here
+              ==========================================
+            -->
+            <p class="about-lead">
+              Hey，我是 Mob1S。一个热爱速度、代码和竞技的开发者。
+            </p>
+            <p>
+              我着迷于将创意变为现实——无论是写一段优雅的代码，还是在赛道上追逐每一个弯心的完美走线。
+              我相信技术和运动有着相同的底层逻辑：不断突破极限，永远追求更快、更强。
+            </p>
+            <p>
+              白天写代码，晚上看比赛。F1、篮球、CS、健身——这些是我生活的燃料。
+              往下翻，了解更多关于我。
+            </p>
+          </div>
+          <div class="about-visual" data-parallax="0.25">
+            <div class="glow-card">
+              <div class="card-inner">
+                <span class="card-icon">&#9670;</span>
+                <p>Motto</p>
+                <p class="card-value">Full<span class="card-unit">Send</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== HOBBIES ==================== -->
+    <section id="hobbies" class="section hobbies-section">
+      <div class="section-content">
+        <h2 class="section-title" data-parallax="0.15">
+          <span class="section-number">02</span>
+          MY WORLD
+        </h2>
+
+        <!-- F1 -->
+        <div class="hobby-row" data-parallax="0.08">
+          <div class="hobby-flag">
+            <span class="hobby-num">01</span>
+            <h3 class="hobby-name">Formula 1</h3>
+          </div>
+          <div class="hobby-body">
+            <p class="hobby-desc">
+              从维斯塔潘的极限推进到勒克莱尔在法拉利的逐梦之路，F1 是我每个周末的肾上腺素来源。红牛与法拉利的巅峰博弈、街道赛的毫厘之争——这就是地表最快的赛事。
+            </p>
+            <div class="hobby-icons">
+              <a href="detail.html?id=verstappen" class="icon-card">
+                <div class="icon-avatar">MV</div>
+                <div class="icon-info">
+                  <span class="icon-name">Max Verstappen</span>
+                  <span class="icon-role">Red Bull Racing · 4× World Champion</span>
+                </div>
+              </a>
+              <a href="detail.html?id=leclerc" class="icon-card">
+                <div class="icon-avatar">CL</div>
+                <div class="icon-info">
+                  <span class="icon-name">Charles Leclerc</span>
+                  <span class="icon-role">Scuderia Ferrari · 排位赛之王</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Basketball -->
+        <div class="hobby-row hobby-reverse" data-parallax="0.1">
+          <div class="hobby-flag">
+            <span class="hobby-num">02</span>
+            <h3 class="hobby-name">Basketball</h3>
+          </div>
+          <div class="hobby-body">
+            <p class="hobby-desc">
+              篮球是得分的艺术，而 KD 和克莱把得分变成了美学。从无解中投到接球三分，他们用最纯粹的方式诠释了什么叫"把球放进篮筐"。
+            </p>
+            <div class="hobby-icons">
+              <a href="detail.html?id=durant" class="icon-card">
+                <div class="icon-avatar">KD</div>
+                <div class="icon-info">
+                  <span class="icon-name">Kevin Durant</span>
+                  <span class="icon-role">Phoenix Suns · 历史级得分手</span>
+                </div>
+              </a>
+              <a href="detail.html?id=klay" class="icon-card">
+                <div class="icon-avatar">KT</div>
+                <div class="icon-info">
+                  <span class="icon-name">Klay Thompson</span>
+                  <span class="icon-role">Dallas Mavericks · 4× Champion</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- CS -->
+        <div class="hobby-row" data-parallax="0.12">
+          <div class="hobby-flag">
+            <span class="hobby-num">03</span>
+            <h3 class="hobby-name">Counter-Strike</h3>
+          </div>
+          <div class="hobby-body">
+            <p class="hobby-desc">
+              CS 不止考验枪法，更考验心态与决策。NiKo 的沙鹰是艺术品，m0NESY 的狙击是未来——这对 G2 双子星定义了新时代的竞技美学。
+            </p>
+            <div class="hobby-icons">
+              <a href="detail.html?id=niko" class="icon-card">
+                <div class="icon-avatar">NK</div>
+                <div class="icon-info">
+                  <span class="icon-name">NiKo</span>
+                  <span class="icon-role">G2 Esports · 传奇步枪手</span>
+                </div>
+              </a>
+              <a href="detail.html?id=m0nesy" class="icon-card">
+                <div class="icon-avatar">M0</div>
+                <div class="icon-info">
+                  <span class="icon-name">m0NESY</span>
+                  <span class="icon-role">G2 Esports · 天才狙击手</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fitness -->
+        <div class="hobby-row hobby-reverse" data-parallax="0.1">
+          <div class="hobby-flag">
+            <span class="hobby-num">04</span>
+            <h3 class="hobby-name">Fitness</h3>
+          </div>
+          <div class="hobby-body">
+            <p class="hobby-desc">
+              健身是和自己较劲的过程。关注凯圣王和谭成义，不只是学动作——学的是如何用科学的方式雕刻自己，日复一日。
+            </p>
+            <div class="hobby-icons">
+              <a href="detail.html?id=kaishengwang" class="icon-card">
+                <div class="icon-avatar">KS</div>
+                <div class="icon-info">
+                  <span class="icon-name">凯圣王</span>
+                  <span class="icon-role">健身博主 · 科学训练推广者</span>
+                </div>
+              </a>
+              <a href="detail.html?id=tanchengyi" class="icon-card">
+                <div class="icon-avatar">TC</div>
+                <div class="icon-info">
+                  <span class="icon-name">谭成义</span>
+                  <span class="icon-role">自然健身 · 蜕变故事</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== DISTILLED ME / CHAT ==================== -->
+    <section id="chat" class="section chat-section">
+      <div class="section-content">
+        <h2 class="section-title" data-parallax="0.15">
+          <span class="section-number">03</span>
+          TALK TO MOB<span class="brand-accent">1S</span>
+        </h2>
+        <div class="chat-grid" data-parallax="0.08">
+          <div class="chat-intro">
+            <p class="chat-lead">这是一个"蒸馏"版的我。</p>
+            <p>
+              通过AI训练，这个聊天机器人将会了解我的思维方式、说话风格和知识背景。
+              就像和我本人对话一样——你可以问我任何问题。
+            </p>
+            <div class="chat-status">
+              <span class="status-dot"></span>
+              <span class="status-text">AI 模型训练中，敬请期待…</span>
+            </div>
+            <!--
+              ==========================================
+              后端接口预留说明
+              Chat API Interface (placeholder)
+
+              接入真实AI后端时，修改以下配置：
+              1. 在 script.js 中找到 ChatConfig 对象
+              2. 设置 apiEndpoint 为你的后端地址
+              3. 根据你的API格式修改 sendMessage 函数
+              ==========================================
+            -->
+          </div>
+          <div class="chat-window">
+            <div class="chat-messages" id="chatMessages">
+              <div class="chat-msg bot">
+                <div class="msg-avatar">M</div>
+                <div class="msg-bubble">
+                  <p>Hey! 我是 Mob1S 的 AI 分身。</p>
+                  <p>等我训练完成后，你可以在这里和我聊天。暂时先逛逛其他板块吧 👋</p>
+                </div>
+              </div>
+            </div>
+            <div class="chat-input-area">
+              <input
+                type="text"
+                class="chat-input"
+                id="chatInput"
+                placeholder="输入消息…（AI 尚未接入）"
+                disabled
+              />
+              <button class="chat-send-btn" id="chatSendBtn" disabled>
+                <span class="send-arrow">↑</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <p>&copy; 2026 Mob1S. Built with speed.</p>
+      <div class="footer-speed-line"></div>
+    </div>
+  </footer>
+
+  <!-- 内联脚本：确保导航跳转不依赖模块加载 -->
+  <script>
+    (function() {
+      // Hero CTA 按钮跳转
+      document.querySelectorAll('[data-scroll-to]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var target = document.getElementById(this.dataset.scrollTo);
+          if (target) target.scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+      // 导航栏 active 状态
+      var sections = document.querySelectorAll('.section');
+      var navLinks = document.querySelectorAll('.nav-link');
+      var navbar = document.querySelector('.navbar');
+      window.addEventListener('scroll', function() {
+        var vh = window.innerHeight;
+        var current = '';
+        sections.forEach(function(sec) {
+          var rect = sec.getBoundingClientRect();
+          if (rect.top <= vh * 0.4 && rect.bottom >= vh * 0.4) current = sec.id;
+        });
+        navLinks.forEach(function(link) {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+        });
+        if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 60);
+      }, { passive: true });
+    })();
+  </script>
+  <script type="module" src="script.js"></script>
+</body>
+</html>

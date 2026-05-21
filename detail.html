@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>个人档案 | Profile</title>
+  <style>
+    /* ============================================
+       Detail Page — consistent with main site
+       Dark + Neon accent
+       ============================================ */
+    :root {
+      --bg-deep: #050508;
+      --bg-surface: #0a0a12;
+      --bg-card: #0e0e1a;
+      --neon: #c8ff00;
+      --neon-dim: rgba(200,255,0,0.15);
+      --neon-glow: rgba(200,255,0,0.4);
+      --text-primary: #e8e8ed;
+      --text-secondary: #8888a0;
+      --text-muted: #555568;
+      --border-subtle: rgba(255,255,255,0.06);
+      --border-glow: rgba(200,255,0,0.3);
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* --- Back button --- */
+    .back-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+
+    .back-link:hover { color: var(--neon); }
+
+    .back-arrow {
+      font-size: 1.2rem;
+      line-height: 1;
+      color: var(--neon);
+    }
+
+    /* --- Hero --- */
+    .detail-hero {
+      min-height: 55vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      padding: 6rem 2rem 4rem;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(200,255,0,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-bg-lines {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px),
+        linear-gradient(0deg, var(--border-subtle) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      border: 1px solid var(--neon);
+      color: var(--neon);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      padding: 0.4rem 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-name {
+      font-size: clamp(2.5rem, 7vw, 5.5rem);
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-name .hl {
+      color: var(--neon);
+      text-shadow: 0 0 60px var(--neon-glow);
+    }
+
+    .hero-role {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      margin-top: 1rem;
+    }
+
+    /* --- Content --- */
+    .detail-content {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 2rem 5rem;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+    }
+
+    @media (max-width: 700px) {
+      .content-grid { grid-template-columns: 1fr; gap: 2rem; }
+    }
+
+    /* --- Bio --- */
+    .bio-section h2,
+    .stats-section h2 {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--neon);
+      margin-bottom: 1rem;
+    }
+
+    .bio-section p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+
+    /* --- Stats --- */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .stat-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--neon);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    /* --- Achievements --- */
+    .achievements {
+      margin-top: 3rem;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 2rem;
+    }
+
+    .achievements h2 {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--neon);
+      margin-bottom: 1.5rem;
+    }
+
+    .achieve-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+
+    @media (max-width: 700px) {
+      .achieve-list { grid-template-columns: 1fr; }
+    }
+
+    .achieve-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+    }
+
+    .achieve-marker {
+      color: var(--neon);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* --- Not found --- */
+    .not-found {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .not-found h2 {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--neon);
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <a class="back-bar" href="index.html#hobbies">
+    <span class="back-link">
+      <span class="back-arrow">&#8592;</span> Back to Home
+    </span>
+  </a>
+
+  <main id="app">
+    <!-- Rendered by JS -->
+  </main>
+
+  <script>
+    // =============================================
+    // Person data — 8 people across 4 hobbies
+    // =============================================
+    const PROFILES = {
+      verstappen: {
+        name: 'Max Verstappen',
+        tag: 'Formula 1',
+        role: 'Red Bull Racing · 4× World Champion',
+        avatar: 'MV',
+        bio: [
+          '马克斯·维斯塔潘 1997年9月30日出生于比利时哈塞尔特，荷兰籍。他是F1历史上最具统治力的车手之一——2021年到2024年连续四年加冕世界冠军，而且赢得越来越轻松。',
+          '维斯塔潘的驾驶风格可以用一个词形容：极限。无论干地湿地，他总能把赛车推到物理边界的边缘却不失控。2022年匈牙利站他从第10位发车最终夺冠，那种碾压式的推进节奏至今让人头皮发麻。他的刹车控制和弯中微调是围场公认的天花板级别。',
+          '场下的 Max 比他父亲 Jos 温和得多——喜欢和女友玩 SIM 赛车、踢足球，偶尔发发推特怼赛会。从那个16岁在雨中 Spa 飞驰的红牛青训小孩，到如今不可撼动的四冠王，他用自己的方式重新定义了"统治"这个词。'
+        ],
+        stats: [
+          { v: '#1', l: 'Car Number' },
+          { v: '2015', l: 'F1 Debut (17岁)' },
+          { v: '4×', l: 'World Champion' },
+          { v: '63+', l: 'Race Wins' }
+        ],
+        achievements: [
+          '2021-2024 连续四届F1世界冠军',
+          'F1史上最年轻参赛车手（17岁166天）',
+          '2023赛季19胜创单赛季最多胜纪录',
+          '红牛队史最成功的车手',
+          '2022年从P10发车夺冠的经典之战',
+          '从小在卡丁车赛场横扫冠军的天才少年'
+        ]
+      },
+
+      leclerc: {
+        name: 'Charles Leclerc',
+        tag: 'Formula 1',
+        role: 'Scuderia Ferrari · 排位赛之王',
+        avatar: 'CL',
+        bio: [
+          '夏尔·勒克莱尔 1997年10月16日出生于摩纳哥。作为法拉利车队的王牌，他被 Tifosi 寄予厚望——一个摩纳哥人开着红色跃马追逐世界冠军，这本身就是一个浪漫的故事。',
+          '勒克莱尔最大的杀手锏是排位赛单圈能力。在极限边缘游走而不失控，这种对轮胎和抓地力的直觉几乎是天生的。他的教父是已故的法拉利青训车手 Jules Bianchi，这份传承让他的赛车之路承载了更多意义。',
+          '2024年他在摩纳哥主场夺冠的那一刻，所有看着他长大的人都红了眼眶。从卡丁车到F1，从索伯到法拉利，Leclerc 的成长轨迹写满了天赋与韧性。我粉他不只是因为快——更因为他身上那种明知山有虎偏向虎山行的劲头。'
+        ],
+        stats: [
+          { v: '#16', l: 'Car Number' },
+          { v: '2018', l: 'F1 Debut' },
+          { v: '26+', l: 'Pole Positions' },
+          { v: '8+', l: 'Race Wins' }
+        ],
+        achievements: [
+          '2016 GP3系列赛冠军',
+          '2017 F2锦标赛冠军（新秀年）',
+          '2019 比利时站F1首胜',
+          '2024 摩纳哥站主场夺冠',
+          '多个赛道排位赛圈速记录保持者',
+          '法拉利队史最年轻的杆位获得者'
+        ]
+      },
+
+      durant: {
+        name: 'Kevin Durant',
+        tag: 'Basketball',
+        role: 'Phoenix Suns · 历史级得分手',
+        avatar: 'KD',
+        bio: [
+          '凯文·杜兰特 1988年9月29日出生于华盛顿特区。身高接近7尺却能像后卫一样运球急停跳投——"死神"的招牌中投是NBA历史上最无解的进攻武器之一，你知道他要出手，但你就是盖不到。',
+          '2次NBA总冠军、1次常规赛MVP、4次得分王、奥运会金牌大满贯——KD 的荣誉柜里什么都不缺。但真正让我迷上他的是那种纯粹：他不关心流量、不搞营销噱头，就是每天泡在球馆里打磨技术。在篮网跟腱断裂后归来场均接近30分，这种恢复能力简直反人类。',
+          '场外的 KD 是个真实的篮球迷——他会在推特上和网友对线，会投资女足和青少年篮球项目，也会在深夜刷社交媒体然后点赞粉丝的剪辑视频。有人说他敏感，但我觉得这就是他：一个只在乎篮球本身的天才。'
+        ],
+        stats: [
+          { v: '#35/#7', l: 'Jersey Number' },
+          { v: '4×', l: 'Scoring Champ' },
+          { v: '1×', l: 'MVP (2014)' },
+          { v: '29K+', l: 'Career Points' }
+        ],
+        achievements: [
+          '2次NBA总冠军 + 2次FMVP（2017/2018）',
+          '4次得分王（2010-2012/2014）',
+          'NBA历史总得分榜前十',
+          '3次奥运会金牌（2012/2016/2020）',
+          '跟腱断裂后重返巅峰的历史级回归',
+          '2014年常规赛MVP'
+        ]
+      },
+
+      klay: {
+        name: 'Klay Thompson',
+        tag: 'Basketball',
+        role: 'Dallas Mavericks · 4× NBA Champion',
+        avatar: 'KT',
+        bio: [
+          '克莱·汤普森 1990年2月8日出生于洛杉矶。"G6汤"不是外号，是一种玄学——当系列赛打到第六场，克莱就会进入一种疯魔状态，对手的防守策略对他失效，球到手里就出手、出手就进。',
+          '4次NBA总冠军、5次全明星、单节37分、单场14记三分……这些数字背后是一个不需要持球的得分机器。他的接球投篮可能是史上最快、最干净的——0.6秒出手，完美弧线，空心入网。他和库里组成的"水花兄弟"改变了篮球运动的方向。',
+          '2019年总决赛左膝ACL撕裂、2020年跟腱撕裂——连续两年的毁灭性伤病足以终结任何运动员的生涯。但克莱用了941天重返球场，并帮助勇士拿下2022年总冠军。这种从深渊爬回来的故事，比任何数据都更让人动容。'
+        ],
+        stats: [
+          { v: '#11/#31', l: 'Jersey Number' },
+          { v: '4×', l: 'NBA Champion' },
+          { v: '37', l: 'Pts in 1Q (Record)' },
+          { v: '14', l: '3PM in Game (Record)' }
+        ],
+        achievements: [
+          '4次NBA总冠军（2015/2017/2018/2022）',
+          '5次全明星入选',
+          'NBA单节37分历史纪录',
+          'NBA单场14记三分历史纪录',
+          '史上最强的无球射手之一',
+          '克服两次毁灭性伤病的奇迹回归'
+        ]
+      },
+
+      niko: {
+        name: 'NiKo',
+        tag: 'Counter-Strike',
+        role: 'G2 Esports · 传奇步枪手',
+        avatar: 'NK',
+        bio: [
+          'Nikola "NiKo" Kovač 1997年2月16日出生于波黑布尔奇科。如果CS有一本教科书，NiKo 的预瞄、定位和压枪就是其中最完美的插图。他的沙鹰集锦可以当电影看——手枪局的"不公平竞争"代言人。',
+          '从 Mouz 到 FaZe 再到 G2，NiKo 职业生涯的大部分时间都背负着一个沉重的标签——"最好的无Major选手"。2024年上海 Major，他终于用一场统治级的表现撕掉了这个标签。当他在舞台上举起奖杯的时候，所有 CS 老粉都知道这一刻意味着什么。',
+          'NiKo 不是那种会在公共频道嘲讽对手的选手，他的霸气全在准星里。他的表弟 huNter- 和他在 G2 并肩作战，让这支队伍多了一份家族的羁绊感。看 NiKo 的第一视角是一种享受——极致的效率，极致的干净。'
+        ],
+        stats: [
+          { v: '8', l: 'HLTV MVP medals' },
+          { v: '2×', l: 'HLTV #2 Player' },
+          { v: '1×', l: 'Major Champion' },
+          { v: '#3', l: 'HLTV 2017' }
+        ],
+        achievements: [
+          'PWL 上海 2024 Major 冠军',
+          '8枚HLTV MVP奖章',
+          '2017/2021 两次HLTV年度 #2',
+          '多次入选年度Top 20（连续多年Top 5）',
+          'CS:GO/CS2 史上最强步枪手讨论的核心人选',
+          '从波黑走向世界舞台的励志故事'
+        ]
+      },
+
+      m0nesy: {
+        name: 'm0NESY',
+        tag: 'Counter-Strike',
+        role: 'G2 Esports · 天才狙击手',
+        avatar: 'M0',
+        bio: [
+          'Ilya "m0NESY" Osipov 2005年5月1日出生于俄罗斯莫斯科附近的小镇。14岁就在 FACEIT 打到4000分的天才少年，被 NAVI 青训营发掘后直接送到世界舞台——他的成长轨迹本身就是一部电竞童话。',
+          'm0NESY 的 AWP 风格是独一无二的。他融合了 s1mple 的激进和 ZywOo 的冷静，但又有自己独特的灵动——他的甩枪有一种反直觉的美感，很多击杀在慢镜头回放里你依然看不懂他是怎么做到的。加入 G2 后他和 NiKo 组成的双子星火力是当今 CS 赛场上最赏心悦目的组合。',
+          '场下的 m0NESY 就是个普通的俄罗斯大男孩——喜欢和朋友打闹、偶尔在社交媒体上讲冷笑话、采访中总是带着腼腆的笑容。他未来十年都将是 CS 顶级赛事的主角，而他还远远没到巅峰。'
+        ],
+        stats: [
+          { v: '5', l: 'HLTV MVP medals' },
+          { v: '#4', l: 'HLTV 2023 Peak' },
+          { v: '1×', l: 'Major Champion' },
+          { v: '1.22+', l: 'Career Rating' }
+        ],
+        achievements: [
+          'PWL 上海 2024 Major 冠军',
+          '5枚HLTV MVP奖章',
+          '2023年HLTV年度 #4',
+          'NAVI 青训出品的最成功新星',
+          'CS史上最具天赋的年轻AWPer之一',
+          '14岁打进FACEIT 4000分的神童'
+        ]
+      },
+
+      kaishengwang: {
+        name: '凯圣王',
+        tag: 'Fitness',
+        role: '健身博主 · 科学训练推广者',
+        avatar: 'KS',
+        bio: [
+          '凯圣王是目前中文健身圈里少数能讲清楚"为什么"的博主。他的内容不做表面功夫——从肌肉解剖到力学分析，从训练周期安排到饮食搭配，每一期都在教你理解身体而非盲目模仿动作。',
+          '他用大量篇幅强调训练安全和持续性，这在追求流量和"速成秘诀"的自媒体环境里很难得。他推崇自然训练，主张把健身融入生活方式而不是短期打鸡血——这种理念影响了我对训练的根本看法。',
+          '他输出的不只是一套训练计划，而是一种训练哲学。看他的视频会让你觉得健身是一件可以研究一辈子的事——每个动作都有优化的空间，每一块肌肉都有发力的细节。'
+        ],
+        stats: [
+          { v: '科普', l: '内容风格' },
+          { v: '自然', l: '训练理念' },
+          { v: 'B站', l: '主要平台' },
+          { v: '10年+', l: '训练经验' }
+        ],
+        achievements: [
+          '中文健身科普领域的标杆型博主',
+          '以解剖学和力学角度拆解训练动作',
+          '持续推广科学、安全、可持续的健身理念',
+          '影响大量健身爱好者从"瞎练"到"会练"',
+          '打破网络健身"速成神话"的一股清流',
+          '作品中文化身一个耐心的健身教练和朋友'
+        ]
+      },
+
+      tanchengyi: {
+        name: '谭成义',
+        tag: 'Fitness',
+        role: '自然健身实践者 · 蜕变故事',
+        avatar: 'TC',
+        bio: [
+          '谭成义是那种你看了一眼就会记住的健身博主——他的蜕变不是靠天赋和捷径，而是靠年复一年的坚持和对训练的极致专注。他的故事告诉每一个普通人：好身材可以靠时间和正确的方法熬出来。',
+          '他的内容风格非常接地气——不炫技、不卖课焦虑、不夸大补剂作用。更多时候他像是一个比你多练了几年的朋友，在告诉你这个动作哪里容易做错、瓶颈期怎么调整心态。这种真实感在健身区里越来越少见了。',
+          '我关注他不只是为了跟练，更是为了提醒自己：健身这件事没有终点。他的每一条动态都在传递一种信号——保持耐心，做正确的事，剩下的交给时间。'
+        ],
+        stats: [
+          { v: '自然', l: '训练路线' },
+          { v: '真实', l: '内容风格' },
+          { v: '抖音/B站', l: '主要平台' },
+          { v: '8年+', l: '训练经验' }
+        ],
+        achievements: [
+          '以真实自然的健身记录打动广泛受众',
+          '从普通人到健身博主的励志蜕变',
+          '推广零补剂、纯训练驱动的健身理念',
+          '以接地气的风格拉近健身与普通人的距离',
+          '用自身经历证明坚持的力量',
+          '自然健身路线的长期主义践行者'
+        ]
+      }
+    };
+
+    // =============================================
+    // Render
+    // =============================================
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    const data = PROFILES[id];
+
+    const app = document.getElementById('app');
+
+    if (!data) {
+      app.innerHTML = `
+        <div class="not-found">
+          <h2>Profile Not Found</h2>
+          <p style="color:var(--text-muted);margin-bottom:2rem">未找到该人物档案</p>
+          <a href="index.html#hobbies" class="back-link"><span class="back-arrow">&#8592;</span> Back to Hobbies</a>
+        </div>
+      `;
+    } else {
+      document.title = data.name + ' | Profile';
+      const statsHTML = data.stats.map(s => `
+        <div class="stat-box">
+          <div class="stat-value">${s.v}</div>
+          <div class="stat-label">${s.l}</div>
+        </div>
+      `).join('');
+
+      const achieveHTML = data.achievements.map(a => `
+        <div class="achieve-item">
+          <span class="achieve-marker">&#9670;</span>
+          <span>${a}</span>
+        </div>
+      `).join('');
+
+      const bioHTML = data.bio.map(p => `<p>${p}</p>`).join('');
+
+      app.innerHTML = `
+        <div class="detail-hero">
+          <div class="hero-bg"></div>
+          <div class="hero-bg-lines"></div>
+          <div class="hero-inner">
+            <div class="hero-tag">${data.tag}</div>
+            <h1 class="hero-name">${data.name}</h1>
+            <p class="hero-role">${data.role}</p>
+          </div>
+        </div>
+        <div class="detail-content">
+          <div class="content-grid">
+            <div class="bio-section">
+              <h2>Biography</h2>
+              ${bioHTML}
+            </div>
+            <div class="stats-section">
+              <h2>Key Stats</h2>
+              <div class="stats-grid">${statsHTML}</div>
+            </div>
+          </div>
+          <div class="achievements">
+            <h2>Achievements &amp; Highlights</h2>
+            <div class="achieve-list">${achieveHTML}</div>
+          </div>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mob1S — Personal Homepage</title>
+  <title>MOB1S | Carbon Telemetry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <script async src="https://unpkg.com/es-module-shims@1.10.0/dist/es-module-shims.js"></script>
   <script type="importmap">
     {
       "imports": {
@@ -16,74 +18,135 @@
   </script>
 </head>
 <body>
+
+  <!-- Ambient texture overlay -->
+  <div class="carbon-overlay"></div>
+
+  <!-- Telemetry grid lines -->
+  <div class="telemetry-grid"></div>
+
+  <!-- WebGL canvas for particle/spark field -->
   <canvas id="particle-canvas"></canvas>
 
-  <nav class="navbar">
-    <div class="nav-brand">MOB<span class="brand-accent">1S</span></div>
-    <div class="nav-links">
-      <a href="#hero" class="nav-link active">Home</a>
-      <a href="#about" class="nav-link">About</a>
-      <a href="#hobbies" class="nav-link">Hobbies</a>
-      <a href="#chat" class="nav-link">Mob1S AI</a>
+  <!-- ========== TOP TELEMETRY BAR ========== -->
+  <header class="telemetry-bar">
+    <div class="tel-item">
+      <span class="tel-label">SYS</span>
+      <span class="tel-value" id="tel-time">--:--:--</span>
     </div>
+    <div class="tel-item">
+      <span class="tel-label">POS</span>
+      <span class="tel-value" id="tel-scroll">00.0</span>
+    </div>
+    <div class="tel-brand">MOB<span class="brand-accent">1S</span></div>
+    <div class="tel-item">
+      <span class="tel-label">FPS</span>
+      <span class="tel-value" id="tel-fps">60</span>
+    </div>
+    <div class="tel-item">
+      <span class="tel-label">MOD</span>
+      <span class="tel-value tel-active">LIVE</span>
+    </div>
+  </header>
+
+  <!-- ========== NAVIGATION ========== -->
+  <nav class="nav-vertical">
+    <a href="#hero" class="nav-dot active" data-section="hero">
+      <span class="dot-pulse"></span>
+      <span class="dot-label">START</span>
+    </a>
+    <a href="#about" class="nav-dot" data-section="about">
+      <span class="dot-label">ABOUT</span>
+    </a>
+    <a href="#hobbies" class="nav-dot" data-section="hobbies">
+      <span class="dot-label">WORLD</span>
+    </a>
+    <a href="#chat" class="nav-dot" data-section="chat">
+      <span class="dot-label">AI</span>
+    </a>
   </nav>
 
+  <!-- ========== MAIN SECTIONS ========== -->
   <main class="sections-container">
 
-    <!-- ==================== HERO ==================== -->
+    <!-- ===== HERO ===== -->
     <section id="hero" class="section hero-section">
-      <div class="hero-content" data-parallax="0.4">
-        <div class="hero-badge">Mob1S</div>
-        <h1 class="hero-title">
-          <span class="title-line">HELLO, I'M</span>
-          <span class="title-line accent">MOB<span class="brand-accent">1S</span></span>
-        </h1>
-        <p class="hero-subtitle">Developer · Gamer · F1 Enthusiast</p>
-        <div class="hero-cta">
-          <button class="btn-primary" data-scroll-to="about">ABOUT ME</button>
-          <button class="btn-outline" data-scroll-to="hobbies">MY HOBBIES</button>
-          <button class="btn-outline" data-scroll-to="chat">TALK TO MOB1S AI</button>
+      <div class="hero-inner">
+        <div class="hero-knockout">
+          <div class="hero-eyebrow">
+            <span class="eyebrow-line"></span>
+            <span class="eyebrow-text">DEVELOPER · GAMER · F1 ENTHUSIAST</span>
+            <span class="eyebrow-line"></span>
+          </div>
+          <h1 class="hero-title">
+            <span class="title-block" data-reveal>MOB<span class="title-accent">1S</span></span>
+          </h1>
+          <p class="hero-subtitle" data-reveal>
+            <span class="sub-prefix">&gt;</span> Full send. No lift. Always pushing the limit.
+          </p>
+          <div class="hero-actions" data-reveal>
+            <button class="btn-race" data-scroll-to="about">
+              <span class="btn-icon">&#9654;</span>
+              <span class="btn-text">INIT SEQUENCE</span>
+            </button>
+            <button class="btn-pit" data-scroll-to="hobbies">
+              <span class="btn-text">PIT LANE</span>
+              <span class="btn-arrow">&rarr;</span>
+            </button>
+          </div>
         </div>
-      </div>
-      <div class="scroll-indicator">
-        <span class="scroll-line"></span>
-        <span class="scroll-text">SCROLL</span>
+
+        <!-- Speed trace visualization -->
+        <div class="speed-trace">
+          <svg viewBox="0 0 400 60" preserveAspectRatio="none">
+            <polyline class="trace-line" points="0,50 40,45 80,35 120,20 160,15 200,10 240,8 280,5 320,3 360,2 400,0" />
+            <polyline class="trace-glow" points="0,50 40,45 80,35 120,20 160,15 200,10 240,8 280,5 320,3 360,2 400,0" />
+          </svg>
+        </div>
+
+        <div class="scroll-flag">
+          <span class="flag-text">SCROLL</span>
+          <span class="flag-arrow">&darr;</span>
+        </div>
       </div>
     </section>
 
-    <!-- ==================== ABOUT ME ==================== -->
+    <!-- ===== ABOUT ===== -->
     <section id="about" class="section about-section">
       <div class="section-content">
-        <h2 class="section-title" data-parallax="0.15">
-          <span class="section-number">01</span>
-          ABOUT ME
-        </h2>
-        <div class="about-grid">
-          <div class="about-text" data-parallax="0.1">
-            <!--
-              ==========================================
-              在这里编辑你的自我介绍
-              Edit your self-introduction here
-              ==========================================
-            -->
-            <p class="about-lead">
-              Hey，我是 Mob1S。一个热爱速度、代码和竞技的开发者。
+        <div class="section-header">
+          <span class="section-index">SECTOR 01</span>
+          <h2 class="section-title">ABOUT<span class="title-accent">_ME</span></h2>
+          <div class="header-ruler"></div>
+        </div>
+
+        <div class="about-layout">
+          <div class="about-intro" data-parallax="0.08">
+            <p class="intro-knockout">
+              热爱速度、代码和竞技的<span class="inline-accent">开发者</span>
             </p>
-            <p>
+            <p class="intro-body">
               我着迷于将创意变为现实——无论是写一段优雅的代码，还是在赛道上追逐每一个弯心的完美走线。
-              我相信技术和运动有着相同的底层逻辑：不断突破极限，永远追求更快、更强。
+              我相信技术和运动有着相同的底层逻辑：<span class="inline-accent">不断突破极限</span>，永远追求更快、更强。
             </p>
-            <p>
+            <p class="intro-body">
               白天写代码，晚上看比赛。F1、篮球、CS、健身——这些是我生活的燃料。
-              往下翻，了解更多关于我。
             </p>
           </div>
-          <div class="about-visual" data-parallax="0.25">
-            <div class="glow-card">
-              <div class="card-inner">
-                <span class="card-icon">&#9670;</span>
-                <p>Motto</p>
-                <p class="card-value">Full<span class="card-unit">Send</span></p>
+
+          <div class="about-telemetry" data-parallax="0.15">
+            <div class="tel-card">
+              <div class="tel-card-header">
+                <span class="tel-card-id">MOTTO/TELEMETRY</span>
+                <span class="tel-card-status">ACTIVE</span>
+              </div>
+              <div class="tel-card-body">
+                <div class="tel-big-number">FULL<span class="unit">SEND</span></div>
+                <div class="tel-bars">
+                  <div class="tel-bar"><span class="bar-label">SPEED</span><span class="bar-fill" style="width:98%"></span><span class="bar-val">98%</span></div>
+                  <div class="tel-bar"><span class="bar-label">FOCUS</span><span class="bar-fill" style="width:92%"></span><span class="bar-val">92%</span></div>
+                  <div class="tel-bar"><span class="bar-label">BRAKE</span><span class="bar-fill bar-low" style="width:4%"></span><span class="bar-val">04%</span></div>
+                </div>
               </div>
             </div>
           </div>
@@ -91,184 +154,207 @@
       </div>
     </section>
 
-    <!-- ==================== HOBBIES ==================== -->
+    <!-- ===== HOBBIES ===== -->
     <section id="hobbies" class="section hobbies-section">
       <div class="section-content">
-        <h2 class="section-title" data-parallax="0.15">
-          <span class="section-number">02</span>
-          MY WORLD
-        </h2>
-
-        <!-- F1 -->
-        <div class="hobby-row" data-parallax="0.08">
-          <div class="hobby-flag">
-            <span class="hobby-num">01</span>
-            <h3 class="hobby-name">Formula 1</h3>
-          </div>
-          <div class="hobby-body">
-            <p class="hobby-desc">
-              从维斯塔潘的极限推进到勒克莱尔在法拉利的逐梦之路，F1 是我每个周末的肾上腺素来源。红牛与法拉利的巅峰博弈、街道赛的毫厘之争——这就是地表最快的赛事。
-            </p>
-            <div class="hobby-icons">
-              <a href="detail.html?id=verstappen" class="icon-card">
-                <div class="icon-avatar">MV</div>
-                <div class="icon-info">
-                  <span class="icon-name">Max Verstappen</span>
-                  <span class="icon-role">Red Bull Racing · 4× World Champion</span>
-                </div>
-              </a>
-              <a href="detail.html?id=leclerc" class="icon-card">
-                <div class="icon-avatar">CL</div>
-                <div class="icon-info">
-                  <span class="icon-name">Charles Leclerc</span>
-                  <span class="icon-role">Scuderia Ferrari · 排位赛之王</span>
-                </div>
-              </a>
-            </div>
-          </div>
+        <div class="section-header">
+          <span class="section-index">SECTOR 02</span>
+          <h2 class="section-title">MY<span class="title-accent">_WORLD</span></h2>
+          <div class="header-ruler"></div>
         </div>
 
-        <!-- Basketball -->
-        <div class="hobby-row hobby-reverse" data-parallax="0.1">
-          <div class="hobby-flag">
-            <span class="hobby-num">02</span>
-            <h3 class="hobby-name">Basketball</h3>
-          </div>
-          <div class="hobby-body">
-            <p class="hobby-desc">
-              篮球是得分的艺术，而 KD 和克莱把得分变成了美学。从无解中投到接球三分，他们用最纯粹的方式诠释了什么叫"把球放进篮筐"。
-            </p>
-            <div class="hobby-icons">
-              <a href="detail.html?id=durant" class="icon-card">
-                <div class="icon-avatar">KD</div>
-                <div class="icon-info">
-                  <span class="icon-name">Kevin Durant</span>
-                  <span class="icon-role">Phoenix Suns · 历史级得分手</span>
-                </div>
-              </a>
-              <a href="detail.html?id=klay" class="icon-card">
-                <div class="icon-avatar">KT</div>
-                <div class="icon-info">
-                  <span class="icon-name">Klay Thompson</span>
-                  <span class="icon-role">Dallas Mavericks · 4× Champion</span>
-                </div>
-              </a>
-            </div>
-          </div>
-        </div>
+        <div class="hobbies-stack">
 
-        <!-- CS -->
-        <div class="hobby-row" data-parallax="0.12">
-          <div class="hobby-flag">
-            <span class="hobby-num">03</span>
-            <h3 class="hobby-name">Counter-Strike</h3>
-          </div>
-          <div class="hobby-body">
-            <p class="hobby-desc">
-              CS 不止考验枪法，更考验心态与决策。NiKo 的沙鹰是艺术品，m0NESY 的狙击是未来——这对 G2 双子星定义了新时代的竞技美学。
-            </p>
-            <div class="hobby-icons">
-              <a href="detail.html?id=niko" class="icon-card">
-                <div class="icon-avatar">NK</div>
-                <div class="icon-info">
-                  <span class="icon-name">NiKo</span>
-                  <span class="icon-role">G2 Esports · 传奇步枪手</span>
-                </div>
-              </a>
-              <a href="detail.html?id=m0nesy" class="icon-card">
-                <div class="icon-avatar">M0</div>
-                <div class="icon-info">
-                  <span class="icon-name">m0NESY</span>
-                  <span class="icon-role">G2 Esports · 天才狙击手</span>
-                </div>
-              </a>
+          <!-- F1 -->
+          <article class="hobby-panel" data-parallax="0.06">
+            <div class="panel-header">
+              <span class="panel-code">HBY-001</span>
+              <h3 class="panel-title">FORMULA<span class="title-accent">1</span></h3>
+              <span class="panel-frequency">WEEKLY</span>
             </div>
-          </div>
-        </div>
-
-        <!-- Fitness -->
-        <div class="hobby-row hobby-reverse" data-parallax="0.1">
-          <div class="hobby-flag">
-            <span class="hobby-num">04</span>
-            <h3 class="hobby-name">Fitness</h3>
-          </div>
-          <div class="hobby-body">
-            <p class="hobby-desc">
-              健身是和自己较劲的过程。关注凯圣王和谭成义，不只是学动作——学的是如何用科学的方式雕刻自己，日复一日。
-            </p>
-            <div class="hobby-icons">
-              <a href="detail.html?id=kaishengwang" class="icon-card">
-                <div class="icon-avatar">KS</div>
-                <div class="icon-info">
-                  <span class="icon-name">凯圣王</span>
-                  <span class="icon-role">健身博主 · 科学训练推广者</span>
-                </div>
-              </a>
-              <a href="detail.html?id=tanchengyi" class="icon-card">
-                <div class="icon-avatar">TC</div>
-                <div class="icon-info">
-                  <span class="icon-name">谭成义</span>
-                  <span class="icon-role">自然健身 · 蜕变故事</span>
-                </div>
-              </a>
+            <div class="panel-body">
+              <p class="panel-desc">
+                从维斯塔潘的极限推进到勒克莱尔在法拉利的逐梦之路，F1 是我每个周末的肾上腺素来源。红牛与法拉利的巅峰博弈、街道赛的毫厘之争——这就是地表最快的赛事。
+              </p>
+              <div class="panel-drivers">
+                <a href="detail.html?id=verstappen" class="driver-card">
+                  <span class="driver-num">#1</span>
+                  <div class="driver-meta">
+                    <span class="driver-name">Max Verstappen</span>
+                    <span class="driver-team">Red Bull Racing · 4× WDC</span>
+                  </div>
+                  <span class="driver-arrow">&nearr;</span>
+                </a>
+                <a href="detail.html?id=leclerc" class="driver-card">
+                  <span class="driver-num">#16</span>
+                  <div class="driver-meta">
+                    <span class="driver-name">Charles Leclerc</span>
+                    <span class="driver-team">Scuderia Ferrari · Pole King</span>
+                  </div>
+                  <span class="driver-arrow">&nearr;</span>
+                </a>
+              </div>
             </div>
-          </div>
-        </div>
+          </article>
 
+          <!-- Basketball -->
+          <article class="hobby-panel" data-parallax="0.08">
+            <div class="panel-header">
+              <span class="panel-code">HBY-002</span>
+              <h3 class="panel-title">BASKET<span class="title-accent">BALL</span></h3>
+              <span class="panel-frequency">DAILY</span>
+            </div>
+            <div class="panel-body">
+              <p class="panel-desc">
+                篮球是得分的艺术，而 KD 和克莱把得分变成了美学。从无解中投到接球三分，他们用最纯粹的方式诠释了什么叫"把球放进篮筐"。
+              </p>
+              <div class="panel-drivers">
+                <a href="detail.html?id=durant" class="driver-card">
+                  <span class="driver-num">#35</span>
+                  <div class="driver-meta">
+                    <span class="driver-name">Kevin Durant</span>
+                    <span class="driver-team">Phoenix Suns · All-Time Scorer</span>
+                  </div>
+                  <span class="driver-arrow">&nearr;</span>
+                </a>
+                <a href="detail.html?id=klay" class="driver-card">
+                  <span class="driver-num">#11</span>
+                  <div class="driver-meta">
+                    <span class="driver-name">Klay Thompson</span>
+                    <span class="driver-team">Dallas Mavericks · 4× Champ</span>
+                  </div>
+                  <span class="driver-arrow">&nearr;</span>
+                </a>
+              </div>
+            </div>
+          </article>
+
+          <!-- CS -->
+          <article class="hobby-panel" data-parallax="0.1">
+            <div class="panel-header">
+              <span class="panel-code">HBY-003</span>
+              <h3 class="panel-title">COUNTER<span class="title-accent">STRIKE</span></h3>
+              <span class="panel-frequency">ACTIVE</span>
+            </div>
+            <div class="panel-body">
+              <p class="panel-desc">
+                CS 不止考验枪法，更考验心态与决策。NiKo 的沙鹰是艺术品，m0NESY 的狙击是未来——这对 G2 双子星定义了新时代的竞技美学。
+              </p>
+              <div class="panel-drivers">
+                <a href="detail.html?id=niko" class="driver-card">
+                  <span class="driver-num">#G2</span>
+                  <div class="driver-meta">
+                    <span class="driver-name">NiKo</span>
+                    <span class="driver-team">G2 Esports · Rifle Legend</span>
+                  </div>
+                  <span class="driver-arrow">&nearr;</span>
+                </a>
+                <a href="detail.html?id=m0nesy" class="driver-card">
+                  <span class="driver-num">#G2</span>
+                  <div class="driver-meta">
+                    <span class="driver-name">m0NESY</span>
+                    <span class="driver-team">G2 Esports · AWP Prodigy</span>
+                  </div>
+                  <span class="driver-arrow">&nearr;</span>
+                </a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Fitness -->
+          <article class="hobby-panel" data-parallax="0.08">
+            <div class="panel-header">
+              <span class="panel-code">HBY-004</span>
+              <h3 class="panel-title">FIT<span class="title-accent">NESS</span></h3>
+              <span class="panel-frequency">DAILY</span>
+            </div>
+            <div class="panel-body">
+              <p class="panel-desc">
+                健身是和自己较劲的过程。关注凯圣王和谭成义，不只是学动作——学的是如何用科学的方式雕刻自己，日复一日。
+              </p>
+              <div class="panel-drivers">
+                <a href="detail.html?id=kaishengwang" class="driver-card">
+                  <span class="driver-num">#KS</span>
+                  <div class="driver-meta">
+                    <span class="driver-name">凯圣王</span>
+                    <span class="driver-team">科学训练推广者</span>
+                  </div>
+                  <span class="driver-arrow">&nearr;</span>
+                </a>
+                <a href="detail.html?id=tanchengyi" class="driver-card">
+                  <span class="driver-num">#TC</span>
+                  <div class="driver-meta">
+                    <span class="driver-name">谭成义</span>
+                    <span class="driver-team">自然健身 · 蜕变故事</span>
+                  </div>
+                  <span class="driver-arrow">&nearr;</span>
+                </a>
+              </div>
+            </div>
+          </article>
+
+        </div>
       </div>
     </section>
 
-    <!-- ==================== DISTILLED ME / CHAT ==================== -->
+    <!-- ===== AI CHAT ===== -->
     <section id="chat" class="section chat-section">
       <div class="section-content">
-        <h2 class="section-title" data-parallax="0.15">
-          <span class="section-number">03</span>
-          TALK TO MOB<span class="brand-accent">1S</span>
-        </h2>
-        <div class="chat-grid" data-parallax="0.08">
-          <div class="chat-intro">
-            <p class="chat-lead">这是一个"蒸馏"版的我。</p>
-            <p>
-              通过AI训练，这个聊天机器人将会了解我的思维方式、说话风格和知识背景。
-              就像和我本人对话一样——你可以问我任何问题。
-            </p>
-            <div class="chat-status">
-              <span class="status-dot"></span>
-              <span class="status-text">AI 模型训练中，敬请期待…</span>
-            </div>
-            <!--
-              ==========================================
-              后端接口预留说明
-              Chat API Interface (placeholder)
+        <div class="section-header">
+          <span class="section-index">SECTOR 03</span>
+          <h2 class="section-title">MOB<span class="title-accent">1S</span>_AI</h2>
+          <div class="header-ruler"></div>
+        </div>
 
-              接入真实AI后端时，修改以下配置：
-              1. 在 script.js 中找到 ChatConfig 对象
-              2. 设置 apiEndpoint 为你的后端地址
-              3. 根据你的API格式修改 sendMessage 函数
-              ==========================================
-            -->
-          </div>
-          <div class="chat-window">
-            <div class="chat-messages" id="chatMessages">
-              <div class="chat-msg bot">
-                <div class="msg-avatar">M</div>
-                <div class="msg-bubble">
-                  <p>Hey! 我是 Mob1S 的 AI 分身。</p>
-                  <p>等我训练完成后，你可以在这里和我聊天。暂时先逛逛其他板块吧 👋</p>
-                </div>
+        <div class="chat-layout">
+          <div class="chat-intro" data-parallax="0.06">
+            <p class="chat-tagline">这是一个"蒸馏"版的我。</p>
+            <p class="chat-desc">
+              通过AI训练，这个聊天机器人将会了解我的思维方式、说话风格和知识背景。就像和我本人对话一样。
+            </p>
+            <div class="chat-sysinfo">
+              <div class="sys-row">
+                <span class="sys-key">MODEL STATUS</span>
+                <span class="sys-val" id="sysStatus">TRAINING...</span>
+              </div>
+              <div class="sys-row">
+                <span class="sys-key">VERSION</span>
+                <span class="sys-val">v0.1.0-alpha</span>
+              </div>
+              <div class="sys-row">
+                <span class="sys-key">INTERFACE</span>
+                <span class="sys-val">MOB1S.CHAT</span>
               </div>
             </div>
-            <div class="chat-input-area">
+          </div>
+
+          <div class="chat-terminal" data-parallax="0.1">
+            <div class="term-header">
+              <span class="term-dot term-dot-red"></span>
+              <span class="term-dot term-dot-amber"></span>
+              <span class="term-dot term-dot-green"></span>
+              <span class="term-title">mob1s@terminal:~</span>
+            </div>
+            <div class="term-body" id="chatMessages">
+              <div class="term-line bot">
+                <span class="term-prompt">&gt;</span>
+                <span>Hey! 我是 Mob1S 的 AI 分身。</span>
+              </div>
+              <div class="term-line bot">
+                <span class="term-prompt">&gt;</span>
+                <span>等我训练完成后，你可以在这里和我聊天。暂时先逛逛其他板块。</span>
+              </div>
+            </div>
+            <div class="term-input-row">
+              <span class="term-prompt">&gt;</span>
               <input
                 type="text"
-                class="chat-input"
+                class="term-input"
                 id="chatInput"
                 placeholder="输入消息…（AI 尚未接入）"
                 disabled
               />
-              <button class="chat-send-btn" id="chatSendBtn" disabled>
-                <span class="send-arrow">↑</span>
-              </button>
+              <button class="term-send-btn" id="chatSendBtn" disabled>ENTER</button>
             </div>
           </div>
         </div>
@@ -277,38 +363,55 @@
 
   </main>
 
+  <!-- ========== FOOTER ========== -->
   <footer class="footer">
-    <div class="footer-content">
-      <p>&copy; 2026 Mob1S. Built with speed.</p>
-      <div class="footer-speed-line"></div>
+    <div class="footer-left">
+      <span class="footer-brand">MOB<span class="brand-accent">1S</span></span>
+      <span class="footer-year">© 2026</span>
+    </div>
+    <div class="footer-right">
+      <span class="footer-tag">BUILT WITH SPEED</span>
+      <span class="footer-tag">PUSHING LIMITS</span>
     </div>
   </footer>
 
-  <!-- 内联脚本：确保导航跳转不依赖模块加载 -->
+  <!-- Inline nav + telemetry logic (runs before modules load) -->
   <script>
     (function() {
-      // Hero CTA 按钮跳转
+      // CTA scroll buttons
       document.querySelectorAll('[data-scroll-to]').forEach(function(btn) {
         btn.addEventListener('click', function() {
           var target = document.getElementById(this.dataset.scrollTo);
           if (target) target.scrollIntoView({ behavior: 'smooth' });
         });
       });
-      // 导航栏 active 状态
+
+      // Vertical nav active state
       var sections = document.querySelectorAll('.section');
-      var navLinks = document.querySelectorAll('.nav-link');
-      var navbar = document.querySelector('.navbar');
+      var dots = document.querySelectorAll('.nav-dot');
+
       window.addEventListener('scroll', function() {
         var vh = window.innerHeight;
         var current = '';
         sections.forEach(function(sec) {
           var rect = sec.getBoundingClientRect();
-          if (rect.top <= vh * 0.4 && rect.bottom >= vh * 0.4) current = sec.id;
+          if (rect.top <= vh * 0.45 && rect.bottom >= vh * 0.45) current = sec.id;
         });
-        navLinks.forEach(function(link) {
-          link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+        dots.forEach(function(dot) {
+          dot.classList.toggle('active', dot.dataset.section === current);
         });
-        if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 60);
+
+        // Telemetry bar updates
+        var scrollPercent = (window.scrollY / Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)) * 100;
+        var telScroll = document.getElementById('tel-scroll');
+        if (telScroll) telScroll.textContent = scrollPercent.toFixed(1);
+        var telTime = document.getElementById('tel-time');
+        if (telTime) {
+          var now = new Date();
+          telTime.textContent = now.getHours().toString().padStart(2,'0') + ':' +
+                                now.getMinutes().toString().padStart(2,'0') + ':' +
+                                now.getSeconds().toString().padStart(2,'0');
+        }
       }, { passive: true });
     })();
   </script>

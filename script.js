@@ -161,11 +161,18 @@ function handleMouseMove(e) {
   targetMaskY = e.clientY;
 }
 
-let maskVisible = true;
+let maskVisible = false;
+let maskSuspended = false; // true when easter egg modal is open
+let maskInitialized = false;
 
 document.addEventListener('mousemove', function(e) {
   maskVisible = true;
   handleMouseMove(e);
+  if (!maskInitialized) {
+    maskX = targetMaskX;
+    maskY = targetMaskY;
+    maskInitialized = true;
+  }
 });
 document.addEventListener('mouseleave', function() { maskVisible = false; });
 
@@ -173,6 +180,11 @@ document.addEventListener('touchmove', function(e) {
   var t = e.touches[0];
   maskVisible = true;
   handleMouseMove(t);
+  if (!maskInitialized) {
+    maskX = targetMaskX;
+    maskY = targetMaskY;
+    maskInitialized = true;
+  }
 }, { passive: true });
 
 document.addEventListener('touchend', function() { maskVisible = false; });
@@ -285,7 +297,7 @@ function animateLoop(timestamp) {
   maskY += (targetMaskY - maskY) * 0.08;
 
   if (layerTop) {
-    if (maskVisible) {
+    if (maskVisible && !maskSuspended) {
       var adjustedY = maskY + window.scrollY;
       var maskVal = 'radial-gradient(circle 60px at ' + maskX.toFixed(1) + 'px ' + adjustedY.toFixed(1) + 'px, transparent 60px, black 60px)';
       layerTop.style.webkitMaskImage = maskVal;
@@ -521,11 +533,15 @@ function initScrollAnimations() {
   }
 
   function showModal() {
+    maskSuspended = true;
+    layerTop.style.webkitMaskImage = 'none';
+    layerTop.style.maskImage = 'none';
     modalOverlay.classList.add('active');
   }
 
   function hideModal() {
     modalOverlay.classList.remove('active');
+    maskSuspended = false;
     resetProgress();
   }
 

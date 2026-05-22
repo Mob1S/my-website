@@ -376,11 +376,6 @@ body {
   left: 2rem;
 }
 
-.hud-tr {
-  top: 1.2rem;
-  right: 4rem;
-  text-align: right;
-}
 
 .hud-label {
   font-family: var(--font-mono);
@@ -402,12 +397,14 @@ body {
   position: absolute;
   top: 0;
   right: 0;
-  width: 36px;
-  height: 36px;
+  width: 80px;
+  height: 80px;
   z-index: 3;
-  background: repeating-conic-gradient(var(--neon) 0% 25%, transparent 0% 50%) 50% / 9px 9px;
-  opacity: 0.12;
+  background: repeating-conic-gradient(var(--neon) 0% 25%, transparent 0% 50%) 50% / 14px 14px;
+  opacity: 0.35;
   pointer-events: none;
+  mask-image: linear-gradient(135deg, black 30%, transparent 100%);
+  -webkit-mask-image: linear-gradient(135deg, black 30%, transparent 100%);
 }
 
 /* --- Track Easter Egg --- */

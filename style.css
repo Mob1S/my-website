@@ -45,7 +45,7 @@ body {
 
 /* --- Carbon Fiber Overlay --- */
 .carbon-overlay {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
@@ -70,7 +70,7 @@ body {
 
 /* --- Telemetry Grid --- */
 .telemetry-grid {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
@@ -84,11 +84,60 @@ body {
 
 /* --- Canvas Layer --- */
 #particle-canvas {
-  position: fixed;
+  position: absolute;
   top: 0; left: 0;
-  width: 100vw; height: 100vh;
+  width: 100%; height: 100%;
   z-index: 1;
   pointer-events: none;
+}
+
+/* --- Dual-Layer Mask Reveal System --- */
+
+/* Bottom layer: Paper + Ink theme, revealed through mask hole */
+.layer-bottom {
+  --carbon: #f5f5f0;
+  --carbon-light: #ffffff;
+  --carbon-card: #ffffff;
+  --neon: #ff2d2d;
+  --neon-dim: rgba(255, 45, 45, 0.12);
+  --neon-glow: rgba(255, 45, 45, 0.3);
+  --neon-ghost: rgba(255, 45, 45, 0.05);
+  --amber: #e67e00;
+  --amber-dim: rgba(230, 126, 0, 0.2);
+  --titanium: #666666;
+  --titanium-dim: #999999;
+  --white: #1a1a1a;
+  --white-dim: #666666;
+  --border-hairline: rgba(0, 0, 0, 0.08);
+  --border-subtle: rgba(0, 0, 0, 0.12);
+  --border-active: rgba(255, 45, 45, 0.25);
+
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: #f5f5f0;
+  color: #1a1a1a;
+}
+
+.layer-bottom-inner {
+  will-change: transform;
+}
+
+/* Bottom layer: deeper Monza track visibility */
+.layer-bottom .monza-track path[stroke-width="30"] {
+  opacity: 0.4 !important;
+}
+.layer-bottom .monza-track path[stroke-dasharray] {
+  opacity: 0.6 !important;
+}
+
+/* Top layer: Carbon + Neon theme, mask applied via JS */
+.layer-top {
+  position: relative;
+  z-index: 1;
+  background: var(--carbon);
 }
 
 /* =============================================
@@ -300,6 +349,197 @@ body {
 /* =============================================
    HERO SECTION
    ============================================= */
+
+/* Monza circuit background */
+.monza-track {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 75%;
+  height: 75%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Telemetry HUD corners */
+.hud-corner {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.hud-tl {
+  top: 1.2rem;
+  left: 2rem;
+}
+
+.hud-tr {
+  top: 1.2rem;
+  right: 4rem;
+  text-align: right;
+}
+
+.hud-label {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--titanium-dim);
+}
+
+.hud-value {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--neon);
+}
+
+/* Checkered flag corner */
+.checkered-flag {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  z-index: 3;
+  background: repeating-conic-gradient(var(--neon) 0% 25%, transparent 0% 50%) 50% / 9px 9px;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+/* --- Track Easter Egg --- */
+.monza-track {
+  pointer-events: none;
+  z-index: 1;
+}
+.hero-section .monza-track .track-detect {
+  pointer-events: stroke;
+  cursor: crosshair;
+}
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+.track-egg-hint {
+  position: absolute;
+  bottom: 18%;
+  right: 10%;
+  z-index: 4;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: var(--neon);
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+.track-egg-hint.faded {
+  opacity: 0;
+}
+.track-egg-dots {
+  position: absolute;
+  bottom: 14%;
+  right: 10%;
+  z-index: 4;
+  display: flex;
+  gap: 6px;
+  pointer-events: none;
+}
+.track-egg-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border-subtle);
+  border: 1px solid var(--border-hairline);
+  transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.track-egg-dot.hit {
+  background: var(--neon);
+  border-color: var(--neon);
+  box-shadow: 0 0 6px var(--neon-glow), 0 0 12px var(--neon-dim);
+}
+.track-egg-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.track-egg-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.track-egg-modal {
+  position: relative;
+  width: 380px;
+  max-width: 90vw;
+  padding: 2.5rem 2rem 2rem;
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.015) 2px, rgba(255,255,255,0.015) 4px),
+    #0a0a0c;
+  border: 2px solid var(--neon);
+  border-radius: 4px;
+  box-shadow: 0 0 20px var(--neon-dim), 0 0 60px rgba(191, 255, 0, 0.08), inset 0 0 30px rgba(0,0,0,0.5);
+  text-align: center;
+  transform: scale(0.85);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.track-egg-modal-overlay.active .track-egg-modal {
+  transform: scale(1);
+}
+.track-egg-modal-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: var(--titanium-dim);
+  font-size: 1.4rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s;
+}
+.track-egg-modal-close:hover {
+  color: var(--neon);
+}
+.track-egg-modal h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--neon);
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 10px var(--neon-glow);
+}
+.track-egg-modal p {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.8;
+  color: var(--titanium);
+}
+.track-egg-modal .egg-emoji {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+/* Hide easter egg UI in bottom layer */
+.layer-bottom .track-egg-modal-overlay,
+.layer-bottom .track-egg-dots,
+.layer-bottom .track-egg-hint {
+  display: none;
+}
+
 .hero-section {
   min-height: 100vh;
   display: flex;
@@ -370,113 +610,6 @@ body {
   margin-right: 0.3em;
 }
 
-.hero-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 0.5rem;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-/* Race button (primary) */
-.btn-race {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  background: transparent;
-  color: var(--white);
-  border: 1px solid var(--neon);
-  padding: 0.75rem 1.5rem;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  cursor: pointer;
-  transition: all 0.3s;
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%);
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-race::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--neon);
-  transform: translateX(-100%);
-  transition: transform 0.35s cubic-bezier(0.75, 0, 0.25, 1);
-  z-index: -1;
-}
-
-.btn-race:hover::before {
-  transform: translateX(0);
-}
-
-.btn-race:hover {
-  color: #000;
-  box-shadow: 0 0 40px var(--neon-glow);
-}
-
-.btn-icon {
-  font-size: 0.55rem;
-  color: var(--neon);
-  transition: color 0.3s;
-}
-
-.btn-race:hover .btn-icon {
-  color: #000;
-}
-
-/* Pit button (secondary) */
-.btn-pit {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: transparent;
-  color: var(--white-dim);
-  border: 1px solid var(--border-subtle);
-  padding: 0.75rem 1.5rem;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  cursor: pointer;
-  transition: all 0.3s;
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%);
-}
-
-.btn-pit:hover {
-  border-color: var(--neon);
-  color: var(--neon);
-}
-
-.btn-arrow { transition: transform 0.3s; }
-
-.btn-pit:hover .btn-arrow {
-  transform: translateX(4px);
-}
-
-/* Speed trace */
-.speed-trace {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  z-index: 2;
-  opacity: 0.5;
-}
-
-.speed-trace svg {
-  width: 100%;
-  height: 100%;
-}
-
-.trace-line {
-  fill: none;
-  stroke: var(--titanium-dim);
-  stroke-width: 1;
-}
 
 .trace-glow {
   fill: none;
@@ -484,37 +617,6 @@ body {
   stroke-width: 2;
   opacity: 0.6;
   filter: drop-shadow(0 0 6px var(--neon-glow));
-}
-
-/* Scroll flag */
-.scroll-flag {
-  position: absolute;
-  bottom: 5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.4rem;
-  z-index: 3;
-}
-
-.flag-text {
-  font-family: var(--font-mono);
-  font-size: 0.55rem;
-  letter-spacing: 0.35em;
-  color: var(--titanium-dim);
-}
-
-.flag-arrow {
-  font-size: 0.9rem;
-  color: var(--neon);
-  animation: flagBounce 2s ease-in-out infinite;
-}
-
-@keyframes flagBounce {
-  0%, 100% { transform: translateY(0); opacity: 0.4; }
-  50% { transform: translateY(8px); opacity: 1; }
 }
 
 /* =============================================
@@ -1063,11 +1165,6 @@ body {
     padding: 4rem 1.25rem;
   }
 
-  .hero-actions {
-    flex-direction: column;
-    align-items: center;
-  }
-
   .panel-header {
     flex-wrap: wrap;
     gap: 0.5rem;
@@ -1099,7 +1196,6 @@ body {
     justify-content: center;
   }
 
-  .speed-trace { display: none; }
 }
 
 @media (max-width: 480px) {

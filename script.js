@@ -9,14 +9,23 @@ import { animate, stagger } from 'animejs';
 console.log('[MOB1S] Engine starting...');
 
 /* =============================================
-   0. Chat Config (API placeholder)
+   0. Chat Config & Conversation State
    ============================================= */
 const ChatConfig = {
-  apiEndpoint: '',
-  enabled: false,
-  buildPayload(message) { return { message }; },
-  parseResponse(data) { return data?.reply || data?.text || data?.content || ''; },
+  apiEndpoint: '/api/chat',
+  enabled: true,
+  buildPayload(messages) { return { messages }; },
+  parseResponse(data) { return data?.reply || ''; },
 };
+
+// Conversation history (role-based, sent to backend)
+// Starts with bot's protocol greeting so every request includes full context
+let chatHistory = [
+  { role: 'assistant', content: '你好，你是谁？' },
+];
+
+// Track if user has identified themselves to avoid re-asking
+let userIdentified = false;
 
 /* =============================================
    1. WebGL Spark Field
@@ -163,10 +172,19 @@ function handleMouseMove(e) {
 
 let maskVisible = false;
 let maskSuspended = false; // true when easter egg modal is open
+let maskSuppressedByArea = false; // true when over map or chat areas
 let maskInitialized = false;
 
 document.addEventListener('mousemove', function(e) {
   maskVisible = true;
+
+  // Suppress mask over map container and chat terminal — the circular
+  // hole obscures small provinces and is distracting in text-dense areas
+  var mapCtr = document.getElementById('mapContainer');
+  var chatTerm = document.querySelector('.chat-terminal');
+  maskSuppressedByArea = !!((mapCtr && mapCtr.contains(e.target)) ||
+                            (chatTerm && chatTerm.contains(e.target)));
+
   handleMouseMove(e);
   if (!maskInitialized) {
     maskX = targetMaskX;
@@ -179,6 +197,12 @@ document.addEventListener('mouseleave', function() { maskVisible = false; });
 document.addEventListener('touchmove', function(e) {
   var t = e.touches[0];
   maskVisible = true;
+
+  var mapCtr = document.getElementById('mapContainer');
+  var chatTerm = document.querySelector('.chat-terminal');
+  maskSuppressedByArea = !!((mapCtr && mapCtr.contains(e.target)) ||
+                            (chatTerm && chatTerm.contains(e.target)));
+
   handleMouseMove(t);
   if (!maskInitialized) {
     maskX = targetMaskX;
@@ -297,7 +321,7 @@ function animateLoop(timestamp) {
   maskY += (targetMaskY - maskY) * 0.08;
 
   if (layerTop) {
-    if (maskVisible && !maskSuspended) {
+    if (maskVisible && !maskSuspended && !maskSuppressedByArea) {
       var adjustedY = maskY + window.scrollY;
       var maskVal = 'radial-gradient(circle 60px at ' + maskX.toFixed(1) + 'px ' + adjustedY.toFixed(1) + 'px, transparent 60px, black 60px)';
       layerTop.style.webkitMaskImage = maskVal;
@@ -320,6 +344,7 @@ function animateLoop(timestamp) {
 const chatInput = document.getElementById('chatInput');
 const chatSendBtn = document.getElementById('chatSendBtn');
 const chatMessages = document.getElementById('chatMessages');
+const sysStatus = document.getElementById('sysStatus');
 
 function addChatMessage(text, sender) {
   if (!chatMessages) return;
@@ -335,36 +360,92 @@ function addChatMessage(text, sender) {
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
+function setTypingIndicator(show) {
+  var existing = chatMessages && chatMessages.querySelector('.term-line.typing');
+  if (show) {
+    if (!existing) {
+      var line = document.createElement('div');
+      line.className = 'term-line bot typing';
+      var prompt = document.createElement('span');
+      prompt.className = 'term-prompt';
+      prompt.textContent = '>';
+      var dots = document.createElement('span');
+      dots.className = 'typing-dots';
+      dots.textContent = '...';
+      line.appendChild(prompt); line.appendChild(dots);
+      chatMessages.appendChild(line);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+  } else {
+    if (existing) existing.remove();
+  }
+}
+
+function enableChatInputs() {
+  if (chatInput) { chatInput.disabled = false; chatInput.placeholder = '输入消息…'; }
+  if (chatSendBtn) chatSendBtn.disabled = false;
+  if (sysStatus) { sysStatus.textContent = 'ONLINE'; sysStatus.style.color = 'var(--neon)'; sysStatus.style.animation = 'none'; }
+}
+
 async function sendMessage(text) {
   if (!text.trim()) return;
   addChatMessage(text, 'user');
+  chatHistory.push({ role: 'user', content: text });
   if (chatInput) chatInput.value = '';
-  if (!ChatConfig.apiEndpoint) {
-    if (chatInput) chatInput.disabled = true;
-    if (chatSendBtn) chatSendBtn.disabled = true;
-    await new Promise(function(r) { setTimeout(r, 800); });
-    addChatMessage('AI 后端尚未接入。', 'bot');
-    if (chatInput) chatInput.disabled = false;
-    if (chatSendBtn) chatSendBtn.disabled = false;
-    return;
-  }
+
+  setTypingIndicator(true);
+  if (chatInput) chatInput.disabled = true;
+  if (chatSendBtn) chatSendBtn.disabled = true;
+
   try {
     const response = await fetch(ChatConfig.apiEndpoint, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(ChatConfig.buildPayload(text)),
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(ChatConfig.buildPayload(chatHistory)),
     });
-    const data = await response.json();
-    const reply = ChatConfig.parseResponse(data);
-    if (reply) addChatMessage(reply, 'bot');
+
+    setTypingIndicator(false);
+
+    if (!response.ok) {
+      var errData;
+      try { errData = await response.json(); } catch (e) { errData = {}; }
+      addChatMessage(errData.error || 'AI 服务暂时不可用，稍后再试吧。', 'bot');
+    } else {
+      var data = await response.json();
+      var reply = ChatConfig.parseResponse(data);
+      if (reply) {
+        addChatMessage(reply, 'bot');
+        chatHistory.push({ role: 'assistant', content: reply });
+      }
+    }
   } catch (err) {
-    addChatMessage('网络错误，请稍后重试。', 'bot');
+    setTypingIndicator(false);
+    addChatMessage('网络错误，请检查后端是否启动。', 'bot');
   }
+
+  if (chatInput) chatInput.disabled = false;
+  if (chatSendBtn) chatSendBtn.disabled = false;
+  chatInput && chatInput.focus();
 }
+
+// Initialize: show persona greeting, enable input
+(function initChat() {
+  if (!chatMessages) return;
+
+  // Clear placeholder messages
+  chatMessages.innerHTML = '';
+
+  // Protocol greeting
+  addChatMessage('你好，你是谁？', 'bot');
+  addChatMessage('（如果你是我认识的人，告诉我你的名字；不认识也没关系，随便聊聊）', 'bot');
+
+  enableChatInputs();
+})();
 
 if (chatSendBtn) chatSendBtn.addEventListener('click', function() { sendMessage(chatInput ? chatInput.value : ''); });
 if (chatInput) {
   chatInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !e.shiftKey && (ChatConfig.enabled || ChatConfig.apiEndpoint)) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage(chatInput.value);
     }
@@ -428,12 +509,16 @@ function initScrollAnimations() {
       if (el.matches('.chat-terminal')) {
         animate(el, { opacity: { from: 0 }, y: { from: 25 }, duration: 700, delay: 200, ease: 'outExpo' });
       }
+      if (el.matches('.map-container')) {
+        initMyMap();
+        animate(el, { opacity: { from: 0 }, y: { from: 25 }, duration: 800, delay: 100, ease: 'outExpo' });
+      }
       observer.unobserve(el);
     });
   };
 
   var observer = new IntersectionObserver(onEnter, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-  var targets = ['.section-header', '.about-intro', '.tel-card', '.hobby-panel', '.chat-intro', '.chat-terminal'];
+  var targets = ['.section-header', '.about-intro', '.tel-card', '.hobby-panel', '.chat-intro', '.chat-terminal', '.map-container'];
   document.querySelectorAll(targets.join(',')).forEach(function(el) { observer.observe(el); });
 }
 
@@ -585,7 +670,180 @@ function initScrollAnimations() {
 })();
 
 /* =============================================
-   10. Start
+   10. My Map — China Travel Tracker
+   ============================================= */
+var mapInitialized = false;
+
+async function initMyMap() {
+  if (mapInitialized) return;
+  var mapContainer = document.getElementById('mapContainer');
+  if (!mapContainer) return;
+  mapInitialized = true;
+
+  var mod = await import('./map-data.js');
+  var CHINA_PROVINCES = mod.CHINA_PROVINCES;
+  var NINE_DASH_PATH = mod.NINE_DASH_PATH;
+  var NINE_DASH_INSET_PATH = mod.NINE_DASH_INSET_PATH;
+  var SOUTH_CHINA_SEA_ISLANDS = mod.SOUTH_CHINA_SEA_ISLANDS;
+  var MAP_VIEWBOX = mod.MAP_VIEWBOX;
+  var INSET = mod.INSET_VIEWBOX;
+
+  var TRAVELED_CITIES = mod.TRAVELED_CITIES;
+  var svg = document.getElementById('chinaMap');
+  var tooltip = document.getElementById('mapTooltip');
+  if (!svg) return;
+
+  svg.setAttribute('viewBox', MAP_VIEWBOX);
+
+  // Determine which provinces have traveled cities
+  var traveledProvinces = {};
+  Object.keys(TRAVELED_CITIES).forEach(function(key) {
+    var adcode = key.split('_')[0];
+    traveledProvinces[adcode] = true;
+  });
+
+  function getTraveledCount() {
+    return Object.keys(traveledProvinces).length;
+  }
+
+  function updateStatsUI() {
+    var count = getTraveledCount();
+    var pct = Math.round((count / 34) * 100);
+    var countEl = document.getElementById('mapProvinceCount');
+    var barEl = document.getElementById('mapProgressBar');
+    var pctEl = document.getElementById('mapPercent');
+    if (countEl) countEl.innerHTML = count + '<span class="unit">/34</span>';
+    if (barEl) barEl.style.width = pct + '%';
+    if (pctEl) pctEl.textContent = pct + '%';
+  }
+
+  // Render province paths
+  CHINA_PROVINCES.forEach(function(prov) {
+    var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', prov.path);
+    path.classList.add('province-path');
+    path.dataset.adcode = prov.adcode;
+    path.dataset.name = prov.name;
+
+    var isTraveled = traveledProvinces[prov.adcode];
+    if (isTraveled) path.classList.add('visited');
+
+    path.addEventListener('mouseenter', function() {
+      tooltip.textContent = prov.shortName + (isTraveled ? ' · 足迹' : '');
+      tooltip.classList.add('visible');
+    });
+    path.addEventListener('mousemove', function(e) {
+      var rect = mapContainer.getBoundingClientRect();
+      tooltip.style.left = (e.clientX - rect.left) + 'px';
+      tooltip.style.top = (e.clientY - rect.top) + 'px';
+    });
+    path.addEventListener('mouseleave', function() {
+      tooltip.classList.remove('visible');
+    });
+    path.addEventListener('click', function() {
+      window.location.href = 'map-detail.html?id=' + prov.adcode;
+    });
+
+    svg.appendChild(path);
+  });
+
+  // Nine-dash line
+  if (NINE_DASH_PATH) {
+    var dashPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    dashPath.setAttribute('d', NINE_DASH_PATH);
+    dashPath.classList.add('nine-dash-line');
+    svg.appendChild(dashPath);
+  }
+
+  // Islands
+  SOUTH_CHINA_SEA_ISLANDS.forEach(function(isl) {
+    var LNG_MIN = 73, LNG_MAX = 136, LAT_MIN = 3, LAT_MAX = 54;
+    var SVG_W = 900, SVG_H = 850;
+    var x = ((isl.center[0] - LNG_MIN) / (LNG_MAX - LNG_MIN)) * SVG_W;
+    var y = ((LAT_MAX - isl.center[1]) / (LAT_MAX - LAT_MIN)) * SVG_H;
+    var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', x);
+    circle.setAttribute('cy', y);
+    circle.setAttribute('r', 3);
+    circle.classList.add('island-marker');
+    svg.appendChild(circle);
+    var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', x + 6);
+    text.setAttribute('y', y + 3);
+    text.classList.add('island-label');
+    text.textContent = isl.name;
+    svg.appendChild(text);
+  });
+
+  // HK / Macau markers — paths too small at full scale
+  CHINA_PROVINCES.forEach(function(prov) {
+    if (prov.adcode !== 810000 && prov.adcode !== 820000) return;
+    var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', prov.labelX);
+    circle.setAttribute('cy', prov.labelY);
+    circle.setAttribute('r', 5);
+    circle.classList.add('province-dot');
+    if (traveledProvinces[prov.adcode]) circle.classList.add('visited');
+    circle.addEventListener('click', function() {
+      window.location.href = 'map-detail.html?id=' + prov.adcode;
+    });
+    svg.appendChild(circle);
+  });
+
+  // South China Sea inset
+  if (INSET) {
+    var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', INSET.x);
+    rect.setAttribute('y', INSET.y);
+    rect.setAttribute('width', INSET.w);
+    rect.setAttribute('height', INSET.h);
+    rect.classList.add('inset-box');
+    svg.appendChild(rect);
+
+    var label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    label.setAttribute('x', INSET.x + INSET.w / 2);
+    label.setAttribute('y', INSET.y + 14);
+    label.classList.add('inset-label');
+    label.textContent = '南海诸岛';
+    svg.appendChild(label);
+
+    // Hainan in inset
+    var hainan = CHINA_PROVINCES.find(function(p) { return p.name === '海南省'; });
+    if (hainan && hainan.insetPath) {
+      var hPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      hPath.setAttribute('d', hainan.insetPath);
+      hPath.style.fill = '#1a2332';
+      hPath.style.stroke = '#2a3a4a';
+      hPath.style.strokeWidth = '0.5';
+      svg.appendChild(hPath);
+    }
+
+    // Nine-dash in inset
+    if (NINE_DASH_INSET_PATH) {
+      var dashInset = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      dashInset.setAttribute('d', NINE_DASH_INSET_PATH);
+      dashInset.style.fill = 'none';
+      dashInset.style.stroke = 'rgba(100, 160, 220, 0.4)';
+      dashInset.style.strokeWidth = '0.5';
+      dashInset.style.strokeDasharray = '3,1.5';
+      svg.appendChild(dashInset);
+    }
+  }
+
+  updateStatsUI();
+
+  // Sync the populated map to the bottom layer clone so both layers align
+  var bottomSvg = document.querySelector('#layerBottomInner .map-container svg');
+  if (bottomSvg && svg) {
+    bottomSvg.setAttribute('viewBox', svg.getAttribute('viewBox') || '');
+    bottomSvg.innerHTML = svg.innerHTML;
+  }
+}
+
+// Map state is now based on TRAVELED_CITIES (hardcoded), no localStorage refresh needed
+
+/* =============================================
+   11. Start
    ============================================= */
 console.log('[MOB1S] Starting render & animations...');
 animateHeroEntrance();

@@ -1,0 +1,183 @@
+<h2>Hero 赛道元素增强</h2>
+<p class="subtitle">选择你喜欢的方向</p>
+
+<div class="section">
+  <h3>当前状态</h3>
+  <div class="mockup">
+    <div class="mockup-header">现有 hero 区域</div>
+    <div class="mockup-body" style="background:#0a0a0c;padding:40px;text-align:center;position:relative;min-height:280px">
+      <div style="font-size:10px;color:#5a5a66;letter-spacing:0.35em;font-weight:700;margin-bottom:12px">DEVELOPER · GAMER · F1 ENTHUSIAST</div>
+      <div style="font-family:'Orbitron',sans-serif;font-size:48px;font-weight:900;color:#e8e8ec;line-height:1">MOB<span style="color:#bfff00">1S</span></div>
+      <div style="font-size:12px;color:#90909a;margin-top:12px">Full send. No lift. Always pushing the limit.</div>
+      <div style="margin-top:16px;display:flex;gap:10px;justify-content:center">
+        <div style="border:1px solid #bfff00;color:#e8e8ec;padding:6px 14px;font-size:10px;font-weight:700;letter-spacing:0.15em">INIT SEQUENCE</div>
+        <div style="border:1px solid rgba(255,255,255,0.08);color:#90909a;padding:6px 14px;font-size:10px;font-weight:700;letter-spacing:0.15em">PIT LANE →</div>
+      </div>
+      <div style="margin-top:20px;opacity:0.5">
+        <svg width="100%" height="30" viewBox="0 0 400 30" preserveAspectRatio="none">
+          <polyline points="0,25 40,22 80,17 120,10 160,7 200,5 240,4 280,2 320,1 360,1 400,0" fill="none" stroke="#5a5a66" stroke-width="1"/>
+          <polyline points="0,25 40,22 80,17 120,10 160,7 200,5 240,4 280,2 320,1 360,1 400,0" fill="none" stroke="#bfff00" stroke-width="2" opacity="0.6"/>
+        </svg>
+      </div>
+      <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);text-align:center">
+        <div style="font-size:9px;color:#5a5a66;letter-spacing:0.35em">SCROLL</div>
+        <div style="color:#bfff00;font-size:14px">↓</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>增强方案</h3>
+
+  <div class="cards">
+    <div class="card" data-choice="a" onclick="toggleSelect(this)">
+      <div class="card-image">
+        <div style="background:#0a0a0c;padding:30px;text-align:center;position:relative;min-height:280px">
+          <!-- 赛道线图背景 -->
+          <svg style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.06;width:80%;height:60%" viewBox="0 0 200 100">
+            <path d="M20,50 C20,20 50,10 80,10 L120,10 C150,10 180,20 180,50 C180,80 150,90 120,90 L80,90 C50,90 20,80 20,50Z" fill="none" stroke="#bfff00" stroke-width="2"/>
+            <circle cx="20" cy="50" r="3" fill="#bfff00"/>
+            <rect x="16" y="46" width="8" height="2" fill="#bfff00"/>
+          </svg>
+
+          <div style="font-size:10px;color:#5a5a66;letter-spacing:0.35em;font-weight:700;margin-bottom:12px;position:relative">DEVELOPER · GAMER · F1 ENTHUSIAST</div>
+          <div style="font-family:'Orbitron',sans-serif;font-size:48px;font-weight:900;color:#e8e8ec;line-height:1;position:relative">MOB<span style="color:#bfff00">1S</span></div>
+          <div style="font-size:12px;color:#90909a;margin-top:12px;position:relative">Full send. No lift. Always pushing the limit.</div>
+          <div style="margin-top:16px;display:flex;gap:10px;justify-content:center;position:relative">
+            <div style="border:1px solid #bfff00;color:#e8e8ec;padding:6px 14px;font-size:10px;font-weight:700;letter-spacing:0.15em">INIT SEQUENCE</div>
+            <div style="border:1px solid rgba(255,255,255,0.08);color:#90909a;padding:6px 14px;font-size:10px;font-weight:700;letter-spacing:0.15em">PIT LANE →</div>
+          </div>
+
+          <!-- 增强的速度曲线 -->
+          <div style="margin-top:20px;position:relative">
+            <svg width="100%" height="40" viewBox="0 0 400 40" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="traceGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#5a5a66" stop-opacity="0.3"/>
+                  <stop offset="50%" stop-color="#bfff00" stop-opacity="0.5"/>
+                  <stop offset="100%" stop-color="#bfff00" stop-opacity="0.9"/>
+                </linearGradient>
+              </defs>
+              <polyline points="0,35 40,30 80,22 120,15 160,10 200,7 240,5 280,3 320,2 360,1 400,0" fill="none" stroke="url(#traceGrad)" stroke-width="2.5"/>
+              <!-- 速度标记点 -->
+              <circle cx="120" cy="15" r="2.5" fill="#bfff00" opacity="0.7"/>
+              <circle cx="280" cy="3" r="2.5" fill="#bfff00" opacity="0.7"/>
+              <circle cx="400" cy="0" r="3" fill="#bfff00"/>
+            </svg>
+          </div>
+
+          <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);text-align:center">
+            <div style="font-size:9px;color:#5a5a66;letter-spacing:0.35em">SCROLL</div>
+            <div style="color:#bfff00;font-size:14px">↓</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <h3>A. 赛道轮廓 + 速度曲线</h3>
+        <p>背景加半透明赛道线图，速度曲线加渐变和标记点</p>
+      </div>
+    </div>
+
+    <div class="card" data-choice="b" onclick="toggleSelect(this)">
+      <div class="card-image">
+        <div style="background:#0a0a0c;padding:30px;text-align:center;position:relative;min-height:280px">
+          <!-- 棋盘格角标 -->
+          <div style="position:absolute;top:0;right:0;width:40px;height:40px;background:repeating-conic-gradient(#bfff00 0% 25%, transparent 0% 50%) 50%/10px 10px;opacity:0.15"></div>
+          <div style="position:absolute;bottom:0;left:0;width:40px;height:40px;background:repeating-conic-gradient(#bfff00 0% 25%, transparent 0% 50%) 50%/10px 10px;opacity:0.15"></div>
+
+          <!-- 遥测数据条 -->
+          <div style="position:absolute;top:14px;left:20px;text-align:left">
+            <div style="font-size:8px;color:#5a5a66;letter-spacing:0.2em;font-weight:700">SECTOR</div>
+            <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:800;color:#bfff00">S1</div>
+          </div>
+          <div style="position:absolute;top:14px;right:20px;text-align:right">
+            <div style="font-size:8px;color:#5a5a66;letter-spacing:0.2em;font-weight:700">DELTA</div>
+            <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:800;color:#bfff00">-0.312</div>
+          </div>
+
+          <div style="font-size:10px;color:#5a5a66;letter-spacing:0.35em;font-weight:700;margin-bottom:12px;margin-top:30px">DEVELOPER · GAMER · F1 ENTHUSIAST</div>
+          <div style="font-family:'Orbitron',sans-serif;font-size:48px;font-weight:900;color:#e8e8ec;line-height:1">MOB<span style="color:#bfff00">1S</span></div>
+          <div style="font-size:12px;color:#90909a;margin-top:12px">Full send. No lift. Always pushing the limit.</div>
+          <div style="margin-top:16px;display:flex;gap:10px;justify-content:center">
+            <div style="border:1px solid #bfff00;color:#e8e8ec;padding:6px 14px;font-size:10px;font-weight:700;letter-spacing:0.15em">INIT SEQUENCE</div>
+            <div style="border:1px solid rgba(255,255,255,0.08);color:#90909a;padding:6px 14px;font-size:10px;font-weight:700;letter-spacing:0.15em">PIT LANE →</div>
+          </div>
+
+          <div style="margin-top:20px">
+            <svg width="100%" height="30" viewBox="0 0 400 30" preserveAspectRatio="none">
+              <polyline points="0,25 40,22 80,17 120,10 160,7 200,5 240,4 280,2 320,1 360,1 400,0" fill="none" stroke="#5a5a66" stroke-width="1"/>
+              <polyline points="0,25 40,22 80,17 120,10 160,7 200,5 240,4 280,2 320,1 360,1 400,0" fill="none" stroke="#bfff00" stroke-width="2" opacity="0.6"/>
+            </svg>
+          </div>
+
+          <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);text-align:center">
+            <div style="font-size:9px;color:#5a5a66;letter-spacing:0.35em">SCROLL</div>
+            <div style="color:#bfff00;font-size:14px">↓</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <h3>B. 遥测角标 + 棋盘格</h3>
+        <p>左上角 SECTOR、右上角 DELTA 数据，四角棋盘格装饰</p>
+      </div>
+    </div>
+
+    <div class="card" data-choice="c" onclick="toggleSelect(this)">
+      <div class="card-image">
+        <div style="background:#0a0a0c;padding:30px;text-align:center;position:relative;min-height:280px;overflow:hidden">
+          <!-- 赛道轮廓背景 -->
+          <svg style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.05;width:80%;height:60%" viewBox="0 0 200 100">
+            <path d="M20,50 C20,20 50,10 80,10 L120,10 C150,10 180,20 180,50 C180,80 150,90 120,90 L80,90 C50,90 20,80 20,50Z" fill="none" stroke="#bfff00" stroke-width="2"/>
+          </svg>
+
+          <!-- 棋盘格角标 -->
+          <div style="position:absolute;top:0;right:0;width:40px;height:40px;background:repeating-conic-gradient(#bfff00 0% 25%, transparent 0% 50%) 50%/10px 10px;opacity:0.15"></div>
+
+          <!-- 遥测角标 -->
+          <div style="position:absolute;top:14px;left:20px;text-align:left">
+            <div style="font-size:8px;color:#5a5a66;letter-spacing:0.2em;font-weight:700">SECTOR</div>
+            <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:800;color:#bfff00">S1</div>
+          </div>
+          <div style="position:absolute;top:14px;right:60px;text-align:right">
+            <div style="font-size:8px;color:#5a5a66;letter-spacing:0.2em;font-weight:700">DELTA</div>
+            <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:800;color:#bfff00">-0.312</div>
+          </div>
+
+          <div style="font-size:10px;color:#5a5a66;letter-spacing:0.35em;font-weight:700;margin-bottom:12px;margin-top:30px">DEVELOPER · GAMER · F1 ENTHUSIAST</div>
+          <div style="font-family:'Orbitron',sans-serif;font-size:48px;font-weight:900;color:#e8e8ec;line-height:1">MOB<span style="color:#bfff00">1S</span></div>
+          <div style="font-size:12px;color:#90909a;margin-top:12px">Full send. No lift. Always pushing the limit.</div>
+          <div style="margin-top:16px;display:flex;gap:10px;justify-content:center">
+            <div style="border:1px solid #bfff00;color:#e8e8ec;padding:6px 14px;font-size:10px;font-weight:700;letter-spacing:0.15em">INIT SEQUENCE</div>
+            <div style="border:1px solid rgba(255,255,255,0.08);color:#90909a;padding:6px 14px;font-size:10px;font-weight:700;letter-spacing:0.15em">PIT LANE →</div>
+          </div>
+
+          <!-- 增强速度曲线 -->
+          <div style="margin-top:20px">
+            <svg width="100%" height="40" viewBox="0 0 400 40" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="traceGrad2" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#5a5a66" stop-opacity="0.3"/>
+                  <stop offset="50%" stop-color="#bfff00" stop-opacity="0.5"/>
+                  <stop offset="100%" stop-color="#bfff00" stop-opacity="0.9"/>
+                </linearGradient>
+              </defs>
+              <polyline points="0,35 40,30 80,22 120,15 160,10 200,7 240,5 280,3 320,2 360,1 400,0" fill="none" stroke="url(#traceGrad2)" stroke-width="2.5"/>
+              <circle cx="120" cy="15" r="2.5" fill="#bfff00" opacity="0.7"/>
+              <circle cx="400" cy="0" r="3" fill="#bfff00"/>
+            </svg>
+          </div>
+
+          <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);text-align:center">
+            <div style="font-size:9px;color:#5a5a66;letter-spacing:0.35em">SCROLL</div>
+            <div style="color:#bfff00;font-size:14px">↓</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <h3>C. 全部叠加（推荐）</h3>
+        <p>赛道轮廓 + 遥测角标 + 棋盘格 + 渐变速度曲线，完整 F1 氛围</p>
+      </div>
+    </div>
+  </div>
+</div>

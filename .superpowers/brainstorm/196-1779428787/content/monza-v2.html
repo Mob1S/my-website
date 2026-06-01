@@ -1,0 +1,91 @@
+<h2>蒙扎赛道 v2</h2>
+<p class="subtitle">现代蒙扎布局 — 准确还原弯道</p>
+
+<div class="section">
+  <div class="mockup">
+    <div class="mockup-header">准确的蒙扎赛道轮廓</div>
+    <div class="mockup-body" style="background:#0a0a0c;padding:40px;position:relative;min-height:360px;overflow:hidden">
+      <svg style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:65%;height:55%" viewBox="0 0 500 300" fill="none" stroke-linejoin="round" stroke-linecap="round">
+        <!-- 蒙扎赛道 - 现代布局 (顺时针) -->
+        <!-- 主直道 (右侧, 南→北) -->
+        <!-- Variante Rettifilo → Curva Grande → Roggia → Lesmo 1&2 → 直道 → Ascari → Parabolica → 回到主直道 -->
+        <path d="
+          M 350,260
+          L 350,60
+          Q 350,40 340,35
+          L 310,30
+          Q 295,28 290,40
+          L 285,60
+          Q 282,72 270,75
+          L 230,80
+          Q 215,82 210,70
+          L 200,50
+          Q 195,40 185,42
+          L 160,50
+          Q 148,54 145,65
+          L 140,100
+          Q 138,112 125,115
+          L 80,120
+          Q 65,122 60,135
+          L 55,170
+          Q 52,185 65,190
+          L 120,200
+          Q 135,203 138,215
+          L 140,240
+          Q 142,255 155,258
+          L 250,265
+          Q 270,267 280,255
+          L 290,230
+          Q 295,218 310,215
+          L 340,210
+          Q 355,208 360,220
+          L 365,250
+          Q 368,262 355,265
+          Z
+        " stroke="#bfff00" stroke-width="2" opacity="0.08" />
+
+        <!-- 弯道标注点 -->
+        <circle cx="350" cy="60" r="4" fill="#bfff00" opacity="0.5" />
+        <text x="360" y="58" fill="#bfff00" opacity="0.3" font-size="8" font-family="monospace">T1</text>
+
+        <circle cx="285" cy="60" r="4" fill="#bfff00" opacity="0.5" />
+        <text x="295" y="58" fill="#bfff00" opacity="0.3" font-size="8" font-family="monospace">T4</text>
+
+        <circle cx="200" cy="50" r="4" fill="#bfff00" opacity="0.5" />
+        <text x="210" y="48" fill="#bfff00" opacity="0.3" font-size="8" font-family="monospace">T6</text>
+
+        <circle cx="140" cy="100" r="4" fill="#bfff00" opacity="0.5" />
+        <text x="150" y="98" fill="#bfff00" opacity="0.3" font-size="8" font-family="monospace">T8</text>
+
+        <circle cx="60" cy="170" r="4" fill="#bfff00" opacity="0.5" />
+        <text x="70" y="168" fill="#bfff00" opacity="0.3" font-size="8" font-family="monospace">T10</text>
+
+        <!-- 起/终点线 -->
+        <line x1="345" y1="255" x2="355" y2="255" stroke="#bfff00" stroke-width="2.5" opacity="0.6" />
+      </svg>
+
+      <div style="font-size:10px;color:#5a5a66;letter-spacing:0.35em;font-weight:700;margin-bottom:12px;position:relative">DEVELOPER · GAMER · F1 ENTHUSIAST</div>
+      <div style="font-family:'Orbitron',sans-serif;font-size:48px;font-weight:900;color:#e8e8ec;line-height:1;position:relative">MOB<span style="color:#bfff00">1S</span></div>
+      <div style="font-size:12px;color:#90909a;margin-top:12px;position:relative">Full send. No lift. Always pushing the limit.</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="options">
+    <div class="option" data-choice="approve" onclick="toggleSelect(this)">
+      <div class="letter">✓</div>
+      <div class="content">
+        <h3>形状对了，实施</h3>
+        <p>加上遥测角标、棋盘格、渐变速度曲线</p>
+      </div>
+    </div>
+    <div class="option" data-choice="adjust" onclick="toggleSelect(this)">
+      <div class="letter">✎</div>
+      <div class="content">
+        <h3>还需要调整</h3>
+        <p>弯道比例、位置或细节有问题</p>
+      </div>
+    </div>
+  </div>
+</div>

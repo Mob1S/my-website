@@ -1,0 +1,112 @@
+<h2>蒙扎赛道轮廓</h2>
+<p class="subtitle">Autodromo Nazionale Monza — 速度圣殿</p>
+
+<div class="section">
+  <div class="mockup">
+    <div class="mockup-header">Hero 区域预览</div>
+    <div class="mockup-body" style="background:#0a0a0c;padding:40px 30px;text-align:center;position:relative;min-height:340px;overflow:hidden">
+
+      <!-- 蒙扎赛道轮廓 -->
+      <svg style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:70%;height:55%;opacity:0.08" viewBox="0 0 400 200" fill="none" stroke="#bfff00" stroke-width="1.5" stroke-linejoin="round">
+        <!-- 蒙扎赛道主轮廓 -->
+        <path d="
+          M 180,30
+          L 310,30
+          Q 340,30 350,50
+          L 360,80
+          Q 365,95 355,105
+          L 320,115
+          Q 305,118 310,130
+          L 330,150
+          Q 340,160 330,170
+          L 280,180
+          Q 260,184 250,170
+          L 235,140
+          Q 230,130 215,130
+          L 180,135
+          Q 165,137 155,125
+          L 140,100
+          Q 135,90 145,82
+          L 170,70
+          Q 180,66 175,55
+          L 160,38
+          Q 155,30 170,30
+          Z
+        " />
+        <!-- 起/终点线 -->
+        <line x1="180" y1="25" x2="180" y2="35" stroke-width="2" />
+        <!-- Variante del Rettifilo -->
+        <circle cx="340" cy="55" r="3" fill="#bfff00" opacity="0.4" />
+        <!-- Lesmo 1 -->
+        <circle cx="330" cy="150" r="3" fill="#bfff00" opacity="0.4" />
+        <!-- Lesmo 2 -->
+        <circle cx="250" cy="170" r="3" fill="#bfff00" opacity="0.4" />
+        <!-- Ascari -->
+        <circle cx="155" cy="100" r="3" fill="#bfff00" opacity="0.4" />
+        <!-- Parabolica -->
+        <circle cx="170" cy="45" r="3" fill="#bfff00" opacity="0.4" />
+      </svg>
+
+      <!-- 遥测角标 -->
+      <div style="position:absolute;top:14px;left:20px;text-align:left">
+        <div style="font-size:8px;color:#5a5a66;letter-spacing:0.2em;font-weight:700">SECTOR</div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:800;color:#bfff00">S1</div>
+      </div>
+      <div style="position:absolute;top:14px;right:60px;text-align:right">
+        <div style="font-size:8px;color:#5a5a66;letter-spacing:0.2em;font-weight:700">DELTA</div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:800;color:#bfff00">-0.312</div>
+      </div>
+
+      <!-- 棋盘格角标 -->
+      <div style="position:absolute;top:0;right:0;width:36px;height:36px;background:repeating-conic-gradient(#bfff00 0% 25%, transparent 0% 50%) 50%/9px 9px;opacity:0.12"></div>
+
+      <div style="font-size:10px;color:#5a5a66;letter-spacing:0.35em;font-weight:700;margin-bottom:12px;margin-top:30px;position:relative">DEVELOPER · GAMER · F1 ENTHUSIAST</div>
+      <div style="font-family:'Orbitron',sans-serif;font-size:48px;font-weight:900;color:#e8e8ec;line-height:1;position:relative">MOB<span style="color:#bfff00">1S</span></div>
+      <div style="font-size:12px;color:#90909a;margin-top:12px;position:relative">Full send. No lift. Always pushing the limit.</div>
+      <div style="margin-top:16px;display:flex;gap:10px;justify-content:center;position:relative">
+        <div style="border:1px solid #bfff00;color:#e8e8ec;padding:6px 14px;font-size:10px;font-weight:700;letter-spacing:0.15em">INIT SEQUENCE</div>
+        <div style="border:1px solid rgba(255,255,255,0.08);color:#90909a;padding:6px 14px;font-size:10px;font-weight:700;letter-spacing:0.15em">PIT LANE →</div>
+      </div>
+
+      <!-- 渐变速度曲线 -->
+      <div style="margin-top:24px;position:relative">
+        <svg width="100%" height="40" viewBox="0 0 400 40" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="tg" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#5a5a66" stop-opacity="0.3"/>
+              <stop offset="50%" stop-color="#bfff00" stop-opacity="0.5"/>
+              <stop offset="100%" stop-color="#bfff00" stop-opacity="0.9"/>
+            </linearGradient>
+          </defs>
+          <polyline points="0,35 40,30 80,22 120,15 160,10 200,7 240,5 280,3 320,2 360,1 400,0" fill="none" stroke="url(#tg)" stroke-width="2.5"/>
+          <circle cx="120" cy="15" r="2.5" fill="#bfff00" opacity="0.7"/>
+          <circle cx="400" cy="0" r="3" fill="#bfff00"/>
+        </svg>
+      </div>
+
+      <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);text-align:center">
+        <div style="font-size:9px;color:#5a5a66;letter-spacing:0.35em">SCROLL</div>
+        <div style="color:#bfff00;font-size:14px">↓</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="options">
+    <div class="option" data-choice="approve" onclick="toggleSelect(this)">
+      <div class="letter">✓</div>
+      <div class="content">
+        <h3>可以，实施</h3>
+        <p>把蒙扎赛道轮廓、遥测角标、棋盘格、渐变曲线加到 hero 区域</p>
+      </div>
+    </div>
+    <div class="option" data-choice="adjust" onclick="toggleSelect(this)">
+      <div class="letter">✎</div>
+      <div class="content">
+        <h3>需要调整</h3>
+        <p>赛道形状、大小、透明度等需要微调</p>
+      </div>
+    </div>
+  </div>
+</div>

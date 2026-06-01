@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s --connect-timeout 10 -w \"\\\\nHTTP:%{http_code}\" \"https://hub.gitmirror.com/https://raw.githubusercontent.com/g0v/twgeojson/master/json/twcounty2010.2.json\")",
+      "Bash(curl -s --connect-timeout 10 -w \"\\\\nHTTP:%{http_code}\" \"https://www.geojson.io/\")",
+      "Bash(curl -s --connect-timeout 10 -w \"\\\\nHTTP:%{http_code}\" \"https://echarts.apache.org/examples/data/asset/geo/China.json\")"
+    ]
+  }
+}

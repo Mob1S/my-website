@@ -1,0 +1,121 @@
+<h2>实时预览 — 移动鼠标体验</h2>
+<p class="subtitle">配色 D：上层 Carbon+Neon → 下层 Paper+Ink。下方三个 demo 展示了不同的窗口大小和边缘处理。</p>
+
+<div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:2rem;">
+
+  <!-- Demo 1: Small, hard edge -->
+  <div style="flex:1;min-width:260px;">
+    <h4 style="margin:0 0 0.5rem 0;">S + 硬边缘 (120px)</h4>
+    <div id="demo1" style="position:relative;width:100%;height:220px;overflow:hidden;cursor:none;border:1px solid #333;">
+      <!-- Bottom layer (light) -->
+      <div style="position:absolute;inset:0;background:#f5f5f0;padding:1.2rem;font-family:sans-serif;">
+        <div style="font-size:0.5rem;color:#999;letter-spacing:0.2em;margin-bottom:0.5rem;">SYS 14:32:08 · POS 42.5 · MOB1S · MOD LIVE</div>
+        <div style="font-size:1.8rem;font-weight:900;color:#1a1a1a;line-height:1;">MOB<span style="color:#cbf902;">1S</span></div>
+        <div style="font-size:0.65rem;color:#666;font-family:monospace;margin-top:0.2rem;">&gt; Full send. No lift.</div>
+      </div>
+      <!-- Top layer (dark) with mask -->
+      <div id="demo1-top" style="position:absolute;inset:0;background:#0a0a0c;padding:1.2rem;font-family:sans-serif;
+        -webkit-mask-image:radial-gradient(circle 60px at 50% 50%, transparent 60px, black 60px);
+        mask-image:radial-gradient(circle 60px at 50% 50%, transparent 60px, black 60px);
+        -webkit-mask-composite:source-in;">
+        <div style="font-size:0.5rem;color:#5a5a66;letter-spacing:0.2em;margin-bottom:0.5rem;">SYS 14:32:08 · POS 42.5 · MOB1S · MOD LIVE</div>
+        <div style="font-size:1.8rem;font-weight:900;color:#e8e8ec;line-height:1;">MOB<span style="color:#bfff00;">1S</span></div>
+        <div style="font-size:0.65rem;color:#90909a;font-family:monospace;margin-top:0.2rem;">&gt; Full send. No lift.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Demo 2: Medium, soft edge -->
+  <div style="flex:1;min-width:260px;">
+    <h4 style="margin:0 0 0.5rem 0;">M + 羽化边缘 (200px)</h4>
+    <div id="demo2" style="position:relative;width:100%;height:220px;overflow:hidden;cursor:none;border:1px solid #333;">
+      <div style="position:absolute;inset:0;background:#f5f5f0;padding:1.2rem;font-family:sans-serif;">
+        <div style="font-size:0.5rem;color:#999;letter-spacing:0.2em;margin-bottom:0.5rem;">SYS 14:32:08 · POS 42.5 · MOB1S · MOD LIVE</div>
+        <div style="font-size:1.8rem;font-weight:900;color:#1a1a1a;line-height:1;">MOB<span style="color:#cbf902;">1S</span></div>
+        <div style="font-size:0.65rem;color:#666;font-family:monospace;margin-top:0.2rem;">&gt; Full send. No lift.</div>
+      </div>
+      <div id="demo2-top" style="position:absolute;inset:0;background:#0a0a0c;padding:1.2rem;font-family:sans-serif;">
+        <div style="font-size:0.5rem;color:#5a5a66;letter-spacing:0.2em;margin-bottom:0.5rem;">SYS 14:32:08 · POS 42.5 · MOB1S · MOD LIVE</div>
+        <div style="font-size:1.8rem;font-weight:900;color:#e8e8ec;line-height:1;">MOB<span style="color:#bfff00;">1S</span></div>
+        <div style="font-size:0.65rem;color:#90909a;font-family:monospace;margin-top:0.2rem;">&gt; Full send. No lift.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Demo 3: Large, soft edge -->
+  <div style="flex:1;min-width:260px;">
+    <h4 style="margin:0 0 0.5rem 0;">L + 羽化边缘 (300px)</h4>
+    <div id="demo3" style="position:relative;width:100%;height:220px;overflow:hidden;cursor:none;border:1px solid #333;">
+      <div style="position:absolute;inset:0;background:#f5f5f0;padding:1.2rem;font-family:sans-serif;">
+        <div style="font-size:0.5rem;color:#999;letter-spacing:0.2em;margin-bottom:0.5rem;">SYS 14:32:08 · POS 42.5 · MOB1S · MOD LIVE</div>
+        <div style="font-size:1.8rem;font-weight:900;color:#1a1a1a;line-height:1;">MOB<span style="color:#cbf902;">1S</span></div>
+        <div style="font-size:0.65rem;color:#666;font-family:monospace;margin-top:0.2rem;">&gt; Full send. No lift.</div>
+      </div>
+      <div id="demo3-top" style="position:absolute;inset:0;background:#0a0a0c;padding:1.2rem;font-family:sans-serif;">
+        <div style="font-size:0.5rem;color:#5a5a66;letter-spacing:0.2em;margin-bottom:0.5rem;">SYS 14:32:08 · POS 42.5 · MOB1S · MOD LIVE</div>
+        <div style="font-size:1.8rem;font-weight:900;color:#e8e8ec;line-height:1;">MOB<span style="color:#bfff00;">1S</span></div>
+        <div style="font-size:0.65rem;color:#90909a;font-family:monospace;margin-top:0.2rem;">&gt; Full send. No lift.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="options">
+  <div class="option" data-choice="prefer-small" onclick="toggleSelect(this)">
+    <div class="letter">1</div>
+    <div class="content"><h3>喜欢 Demo 1</h3><p>小窗口硬边缘 — 神秘，精准</p></div>
+  </div>
+  <div class="option" data-choice="prefer-medium" onclick="toggleSelect(this)">
+    <div class="letter">2</div>
+    <div class="content"><h3>喜欢 Demo 2</h3><p>中窗口羽化 — 平衡，自然</p></div>
+  </div>
+  <div class="option" data-choice="prefer-large" onclick="toggleSelect(this)">
+    <div class="letter">3</div>
+    <div class="content"><h3>喜欢 Demo 3</h3><p>大窗口羽化 — 沉浸，震撼</p></div>
+  </div>
+</div>
+
+<script>
+(function() {
+  function setupDemo(containerId, topId, size, feather) {
+    var container = document.getElementById(containerId);
+    var topEl = document.getElementById(topId);
+    if (!container || !topEl) return;
+
+    var cx = container.offsetWidth / 2;
+    var cy = container.offsetHeight / 2;
+
+    function updateMask(cxVal, cyVal) {
+      if (feather) {
+        topEl.style.webkitMaskImage = 'radial-gradient(circle ' + size + 'px at ' + cxVal + 'px ' + cyVal + 'px, transparent ' + size + 'px, black ' + (size + feather) + 'px)';
+        topEl.style.maskImage = 'radial-gradient(circle ' + size + 'px at ' + cxVal + 'px ' + cyVal + 'px, transparent ' + size + 'px, black ' + (size + feather) + 'px)';
+      } else {
+        topEl.style.webkitMaskImage = 'radial-gradient(circle ' + size + 'px at ' + cxVal + 'px ' + cyVal + 'px, transparent ' + size + 'px, black ' + size + 'px)';
+        topEl.style.maskImage = 'radial-gradient(circle ' + size + 'px at ' + cxVal + 'px ' + cyVal + 'px, transparent ' + size + 'px, black ' + size + 'px)';
+      }
+    }
+
+    // Initialize mask at center
+    updateMask(cx, cy);
+
+    container.addEventListener('mousemove', function(e) {
+      var rect = container.getBoundingClientRect();
+      updateMask(e.clientX - rect.left, e.clientY - rect.top);
+    });
+
+    container.addEventListener('mouseleave', function() {
+      updateMask(cx, cy);
+    });
+  }
+
+  // Demo 1: small 60px radius, hard edge
+  setupDemo('demo1', 'demo1-top', 60, 0);
+
+  // Demo 2: medium 100px radius, 40px feather
+  setupDemo('demo2', 'demo2-top', 100, 40);
+
+  // Demo 3: large 150px radius, 50px feather
+  setupDemo('demo3', 'demo3-top', 150, 50);
+})();
+</script>

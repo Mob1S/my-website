@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MOB1S | Province</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --carbon: #0a0a0c;
+      --carbon-light: #111115;
+      --carbon-card: #14141a;
+      --neon: #bfff00;
+      --neon-dim: rgba(191, 255, 0, 0.12);
+      --neon-glow: rgba(191, 255, 0, 0.35);
+      --neon-ghost: rgba(191, 255, 0, 0.06);
+      --amber: #ff8c00;
+      --amber-dim: rgba(255, 140, 0, 0.2);
+      --titanium: #a0a0aa;
+      --titanium-dim: #5a5a66;
+      --white: #e8e8ec;
+      --white-dim: #90909a;
+      --border-hairline: rgba(255, 255, 255, 0.05);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-active: rgba(191, 255, 0, 0.25);
+      --font-display: 'Orbitron', system-ui, sans-serif;
+      --font-mono: 'Space Mono', 'Consolas', monospace;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: var(--carbon); }
+    body {
+      font-family: var(--font-mono);
+      background: var(--carbon);
+      color: var(--white);
+      line-height: 1.7;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    .top-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1rem 2rem; border-bottom: 1px solid var(--border-hairline);
+      position: sticky; top: 0;
+      background: rgba(10, 10, 12, 0.92); backdrop-filter: blur(12px); z-index: 100;
+    }
+    .back-link { color: var(--neon); font-size: 0.7rem; letter-spacing: 0.1em; font-weight: 700; transition: opacity 0.2s; }
+    .back-link:hover { opacity: 0.7; }
+    .top-brand { font-family: var(--font-display); font-size: 0.8rem; font-weight: 800; color: var(--white); letter-spacing: 0.05em; }
+    .top-brand .accent { color: var(--neon); }
+    .top-tag { font-size: 0.55rem; letter-spacing: 0.15em; color: var(--titanium-dim); }
+
+    .detail-main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+    .province-hero { text-align: center; padding: 3rem 0 2rem; }
+    .province-tag { font-size: 0.55rem; letter-spacing: 0.2em; color: var(--titanium-dim); border: 1px solid var(--border-subtle); padding: 0.2rem 0.8rem; display: inline-block; }
+    .province-name-en { font-family: var(--font-display); font-size: 2.5rem; font-weight: 900; color: var(--white); margin: 0.6rem 0 0.2rem; letter-spacing: -0.02em; }
+    .province-name-cn { color: var(--neon); font-size: 1rem; }
+
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin-bottom: 2rem; }
+    .stat-card { background: var(--carbon-card); border: 1px solid var(--border-subtle); padding: 0.8rem; text-align: center; border-radius: 2px; }
+    .stat-value { font-size: 1.3rem; font-weight: 900; color: var(--white); }
+    .stat-value.neon { color: var(--neon); }
+    .stat-label { font-size: 0.45rem; letter-spacing: 0.15em; color: var(--titanium-dim); margin-top: 0.2rem; }
+
+    .province-map-container {
+      background: var(--carbon-card); border: 1px solid var(--border-subtle);
+      padding: 1.5rem; margin-bottom: 2rem; border-radius: 2px;
+    }
+    #provinceMap { width: 100%; height: auto; display: block; }
+
+    .city-boundary {
+      fill: none;
+      stroke: rgba(80, 90, 110, 0.5);
+      stroke-width: 0.8;
+      stroke-linejoin: round;
+      cursor: default;
+      transition: fill 0.3s, stroke 0.3s;
+    }
+
+    .city-boundary.footprint {
+      fill: rgba(191, 255, 0, 0.06);
+      stroke: var(--neon);
+      stroke-width: 1;
+      filter: drop-shadow(0 0 3px var(--neon-dim));
+      cursor: pointer;
+    }
+
+    .city-boundary.footprint:hover {
+      fill: rgba(191, 255, 0, 0.14);
+      stroke-width: 1.8;
+      filter: drop-shadow(0 0 6px var(--neon-glow));
+    }
+
+    .city-boundary.wishlist {
+      fill: rgba(255, 140, 0, 0.04);
+      stroke: var(--amber);
+      stroke-width: 1;
+      filter: drop-shadow(0 0 3px var(--amber-dim));
+      cursor: pointer;
+    }
+
+    .city-boundary.wishlist:hover {
+      fill: rgba(255, 140, 0, 0.12);
+      stroke-width: 1.8;
+      filter: drop-shadow(0 0 6px var(--amber-dim));
+    }
+
+    .city-center-label {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      font-weight: 700;
+      text-anchor: middle;
+      dominant-baseline: middle;
+      pointer-events: none;
+      fill: #555;
+    }
+
+    .city-center-label.footprint {
+      fill: var(--neon);
+      font-size: 9px;
+    }
+
+    .city-center-label.wishlist {
+      fill: var(--amber);
+      font-size: 9px;
+    }
+
+    .city-summary {
+      background: rgba(191, 255, 0, 0.04);
+      border: 1px solid var(--border-active);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .city-summary-info { display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+    .city-summary-tag {
+      font-size: 0.5rem;
+      letter-spacing: 0.2em;
+      color: var(--neon);
+      border: 1px solid var(--neon-dim);
+      padding: 0.2rem 0.6rem;
+    }
+    .city-summary-name {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--white);
+    }
+    .city-summary-stats { display: flex; gap: 1.5rem; }
+    .city-summary-stat { text-align: center; }
+    .city-summary-stat-val {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--neon);
+    }
+    .city-summary-stat-lbl {
+      font-size: 0.5rem;
+      letter-spacing: 0.1em;
+      color: var(--titanium-dim);
+    }
+    .city-summary-link {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--neon);
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+    .city-summary-link:hover { opacity: 0.7; }
+
+    .cities-header { margin-bottom: 1rem; }
+    .cities-header-label { font-size: 0.55rem; letter-spacing: 0.15em; color: var(--titanium-dim); }
+    .cities-header-line { height: 1px; background: linear-gradient(90deg, var(--neon), transparent); margin-top: 0.3rem; }
+
+    .cities-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.6rem; }
+    .city-card {
+      background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 0.7rem; text-align: center; border-radius: 2px; transition: all 0.3s;
+    }
+    .city-card.dim { opacity: 0.4; }
+    .city-card.footprint {
+      background: rgba(191, 255, 0, 0.08); border-color: rgba(191, 255, 0, 0.4);
+      box-shadow: 0 0 12px rgba(191, 255, 0, 0.1); cursor: pointer;
+    }
+    .city-card.footprint:hover { border-color: var(--neon); }
+    .city-card.wishlist {
+      background: rgba(255, 140, 0, 0.06); border-color: rgba(255, 140, 0, 0.3);
+      box-shadow: 0 0 10px rgba(255, 140, 0, 0.06); cursor: pointer;
+    }
+    .city-card.wishlist:hover { border-color: var(--amber); }
+    .city-card-name { font-size: 0.75rem; font-weight: 700; color: var(--white-dim); transition: color 0.3s; }
+    .city-card.footprint .city-card-name { color: var(--neon); }
+    .city-card.wishlist .city-card-name { color: var(--amber); }
+    .city-card-status { font-size: 0.5rem; margin-top: 0.15rem; color: #444; transition: color 0.3s; }
+    .city-card.footprint .city-card-status { color: var(--neon); }
+    .city-card.wishlist .city-card-status { color: var(--amber); }
+
+    .empty-state { text-align: center; padding: 4rem 2rem; color: var(--titanium-dim); }
+    .empty-state h2 { font-family: var(--font-display); font-size: 1.5rem; color: var(--amber); margin-bottom: 0.5rem; }
+
+    .detail-footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border-hairline); margin-top: 3rem; }
+    .footer-brand { font-family: var(--font-display); font-size: 0.7rem; font-weight: 800; color: var(--white); letter-spacing: 0.05em; }
+    .footer-brand .accent { color: var(--neon); }
+    .footer-year { font-size: 0.55rem; color: var(--titanium-dim); margin-left: 0.5rem; }
+
+    @media (max-width: 768px) {
+      .detail-main { padding: 1rem; }
+      .province-name-en { font-size: 1.8rem; }
+      .stats-row { grid-template-columns: repeat(3, 1fr); }
+      .cities-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+      .top-bar { padding: 0.8rem 1rem; }
+    }
+    @media (max-width: 480px) {
+      .province-name-en { font-size: 1.4rem; }
+      .stats-row { grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <a href="index.html#mymap" class="back-link">&larr; BACK TO MAP</a>
+    <span class="top-brand">MOB<span class="accent">1S</span></span>
+    <span class="top-tag">PROVINCE</span>
+  </div>
+
+  <main class="detail-main" id="app">
+    <div class="empty-state">
+      <h2>LOADING...</h2>
+      <p>正在加载省份数据</p>
+    </div>
+  </main>
+
+  <footer class="detail-footer">
+    <span class="footer-brand">MOB<span class="accent">1S</span></span>
+    <span class="footer-year">&copy; 2026</span>
+  </footer>
+
+  <script type="module">
+    import { CHINA_PROVINCES, TRAVELED_CITIES } from './map-data.js';
+
+    const params = new URLSearchParams(window.location.search);
+    const adcode = params.get('id');
+    const province = CHINA_PROVINCES.find(p => String(p.adcode) === String(adcode));
+    const app = document.getElementById('app');
+
+    if (!province) {
+      app.innerHTML = `
+        <div class="empty-state">
+          <h2>DATA NOT FOUND</h2>
+          <p>未找到该省份数据</p>
+          <a href="index.html#mymap" class="back-link" style="display:inline-block;margin-top:1rem;">&larr; 返回地图</a>
+        </div>`;
+      throw new Error('Province not found');
+    }
+
+    const cities = province.cities;
+    const mapW = 680, mapH = 500;
+    const bounds = province.bounds || (() => {
+      const lngs = cities.map(c => c.center[0]);
+      const lats = cities.map(c => c.center[1]);
+      return { lngMin: Math.min(...lngs) - 0.8, lngMax: Math.max(...lngs) + 0.8, latMin: Math.min(...lats) - 0.6, latMax: Math.max(...lats) + 0.6 };
+    })();
+
+    const centerLat = (bounds.latMin + bounds.latMax) / 2;
+    const cosLat = Math.cos(centerLat * Math.PI / 180);
+    const lngRange = bounds.lngMax - bounds.lngMin;
+    const latRange = bounds.latMax - bounds.latMin;
+    // Geographic aspect ratio: longitude degrees corrected by cos(lat) vs latitude degrees
+    const geoAspect = (lngRange * cosLat) / latRange;
+    const svgAspect = mapW / mapH;
+
+    let drawW, drawH, offX, offY;
+    if (geoAspect > svgAspect) {
+      drawW = mapW;
+      drawH = mapW / geoAspect;
+      offX = 0;
+      offY = (mapH - drawH) / 2;
+    } else {
+      drawH = mapH;
+      drawW = mapH * geoAspect;
+      offX = (mapW - drawW) / 2;
+      offY = 0;
+    }
+
+    function project(lng, lat) {
+      const x = offX + ((lng - bounds.lngMin) / lngRange) * drawW;
+      const y = offY + ((bounds.latMax - lat) / latRange) * drawH;
+      return [Math.round(x * 10) / 10, Math.round(y * 10) / 10];
+    }
+
+    // Cities the user wants to write impressions about (not yet visited)
+    const WISHLIST_CITIES = [
+      { adcode: '510000', name: '成都' },
+      { adcode: '500000', name: '重庆' },
+      { adcode: '440000', name: '广州' },
+      { adcode: '440000', name: '深圳' },
+      { adcode: '420000', name: '武汉' },
+      { adcode: '430000', name: '长沙' },
+      { adcode: '350000', name: '厦门' },
+      { adcode: '530000', name: '大理' },
+      { adcode: '120000', name: '天津' },
+    ];
+
+    function getCityProfileKey(cityName) {
+      const short = cityName.replace(/市$|地区$|自治州$|盟$|区$|县$/, '');
+      for (const key of Object.keys(TRAVELED_CITIES)) {
+        if (key.startsWith(adcode + '_') && TRAVELED_CITIES[key].name === short) return key;
+      }
+      return null;
+    }
+
+    function getWishlistKey(cityName) {
+      const short = cityName.replace(/市$|地区$|自治州$|盟$|区$|县$/, '');
+      for (const w of WISHLIST_CITIES) {
+        if (String(w.adcode) === String(adcode) && w.name === short) {
+          return `${w.adcode}_${w.name.toLowerCase()}`;
+        }
+      }
+      return null;
+    }
+
+    async function fetchCityBoundaries() {
+      try {
+        const url = `https://geo.datav.aliyun.com/areas_v3/bound/${adcode}_full.json`;
+        const resp = await fetch(url);
+        if (resp.ok) return await resp.json();
+      } catch {}
+      // Aliyun API doesn't cover all provinces — fall back to local GeoJSON from OSM Overpass API
+      try {
+        const localUrl = `data/taiwan-cities.json`;
+        const resp = await fetch(localUrl);
+        if (resp.ok) return await resp.json();
+      } catch {}
+      return null;
+    }
+
+    function geoJSONToSVGPaths(geojson) {
+      // Convert GeoJSON features to SVG path elements grouped by city match
+      if (!geojson || !geojson.features) return '';
+
+      function ringToPath(ring) {
+        let d = '';
+        for (let i = 0; i < ring.length; i++) {
+          const [x, y] = project(ring[i][0], ring[i][1]);
+          d += (i === 0 ? 'M' : 'L') + x + ',' + y;
+        }
+        return d + 'Z';
+      }
+
+      function polygonToPath(coords) {
+        return coords.map(ring => ringToPath(ring)).join(' ');
+      }
+
+      let paths = '';
+      geojson.features.forEach(feature => {
+        const geoName = feature.properties.name;
+        // Match GeoJSON feature to province city by name
+        const city = cities.find(c =>
+          c.name === geoName || c.name.replace(/市$|地区$|自治州$|盟$/, '') === geoName
+        );
+        if (!city) return;
+
+        const profileKey = getCityProfileKey(city.name);
+        const wishKey = !profileKey ? getWishlistKey(city.name) : null;
+        const hasFootprint = !!profileKey;
+        const isWishlist = !!wishKey;
+        const isClickable = hasFootprint || isWishlist;
+        const shortName = city.name.replace(/市$|地区$|自治州$|盟$/, '');
+        const cls = hasFootprint ? 'city-boundary footprint' : (isWishlist ? 'city-boundary wishlist' : 'city-boundary');
+        const href = hasFootprint
+          ? `city-detail.html?id=${profileKey}`
+          : `city-detail.html?id=${wishKey}&name=${encodeURIComponent(shortName)}&province=${encodeURIComponent(province.shortName)}`;
+
+        let pathD = '';
+        if (feature.geometry.type === 'Polygon') {
+          pathD = polygonToPath(feature.geometry.coordinates);
+        } else if (feature.geometry.type === 'MultiPolygon') {
+          pathD = feature.geometry.coordinates.map(poly => polygonToPath(poly)).join(' ');
+        }
+        if (pathD) {
+          const onclick = isClickable ? ` onclick="window.location.href='${href}'"` : '';
+          paths += `<path d="${pathD}" class="${cls}" data-city="${city.name}"${onclick}/>`;
+        }
+      });
+      return paths;
+    }
+
+    async function render() {
+      const footprintCities = cities.filter(c => getCityProfileKey(c.name));
+      const footprintCount = footprintCities.length;
+      const total = cities.length;
+      const pct = total > 0 ? Math.round((footprintCount / total) * 100) : 0;
+
+      // Fetch city boundary GeoJSON
+      const geojson = await fetchCityBoundaries();
+      const boundaryPaths = geojson ? geoJSONToSVGPaths(geojson) : '';
+
+      // City center labels (overlay on boundaries)
+      let cityLabels = '';
+      cities.forEach(city => {
+        const [x, y] = project(city.center[0], city.center[1]);
+        const profileKey = getCityProfileKey(city.name);
+        const wishKey = !profileKey ? getWishlistKey(city.name) : null;
+        const cls = profileKey ? 'footprint' : (wishKey ? 'wishlist' : 'dim');
+        const shortName = city.name.replace(/市$|地区$|自治州$|盟$/, '');
+        cityLabels += `<text x="${x}" y="${y}" class="city-center-label ${cls}">${shortName}</text>`;
+      });
+
+      // City cards — only visited and wishlist cities are clickable
+      let cityCards = '';
+      cities.forEach(city => {
+        const profileKey = getCityProfileKey(city.name);
+        const wishKey = !profileKey ? getWishlistKey(city.name) : null;
+        const hasProfile = !!profileKey;
+        const isWishlist = !!wishKey;
+        const isClickable = hasProfile || isWishlist;
+        const cls = hasProfile ? 'footprint' : (isWishlist ? 'wishlist' : 'dim');
+        const shortName = city.name.replace(/市$|地区$|自治州$|盟$/, '');
+        const href = hasProfile
+          ? `city-detail.html?id=${profileKey}`
+          : `city-detail.html?id=${wishKey}&name=${encodeURIComponent(shortName)}&province=${encodeURIComponent(province.shortName)}`;
+        const statusText = hasProfile ? '● 足迹' : (isWishlist ? '◇ 印象' : '○');
+        if (isClickable) {
+          cityCards += `
+            <a class="city-card ${cls}" href="${href}">
+              <div class="city-card-name">${shortName}</div>
+              <div class="city-card-status">${statusText}</div>
+            </a>`;
+        } else {
+          cityCards += `
+            <div class="city-card ${cls}">
+              <div class="city-card-name">${shortName}</div>
+              <div class="city-card-status">${statusText}</div>
+            </div>`;
+        }
+      });
+
+      // City-level summary for municipalities
+      const MUNICIPALITY_ADCODES = [110000, 120000, 310000, 500000];
+      const isMunicipality = MUNICIPALITY_ADCODES.includes(province.adcode);
+      let citySummaryHTML = '';
+      if (isMunicipality) {
+        const aggKey = Object.keys(TRAVELED_CITIES).find(k => k.startsWith(adcode + '_') && TRAVELED_CITIES[k].aggregate);
+        const wishKey = !aggKey ? getAggregateWishlistKey() : null;
+        if (aggKey) {
+          const agg = TRAVELED_CITIES[aggKey];
+          citySummaryHTML = `<div class="city-summary">
+            <div class="city-summary-info">
+              <span class="city-summary-tag">MUNICIPALITY</span>
+              <span class="city-summary-name">${agg.name}</span>
+            </div>
+            <div class="city-summary-stats">
+              <div class="city-summary-stat">
+                <div class="city-summary-stat-val">${agg.days}天</div>
+                <div class="city-summary-stat-lbl">旅行天数</div>
+              </div>
+              <div class="city-summary-stat">
+                <div class="city-summary-stat-val">${agg.year}</div>
+                <div class="city-summary-stat-lbl">到访年份</div>
+              </div>
+            </div>
+            <a class="city-summary-link" href="city-detail.html?id=${aggKey}">CITY PROFILE &rarr;</a>
+          </div>`;
+        } else if (wishKey) {
+          citySummaryHTML = `<div class="city-summary" style="border-color:var(--amber-dim);background:rgba(255,140,0,0.04);">
+            <div class="city-summary-info">
+              <span class="city-summary-tag" style="color:var(--amber);border-color:var(--amber-dim);">WISHLIST</span>
+              <span class="city-summary-name">${province.shortName}</span>
+            </div>
+            <a class="city-summary-link" href="city-detail.html?id=${wishKey}&name=${encodeURIComponent(province.shortName)}&province=${encodeURIComponent(province.shortName)}">VIEW IMPRESSION &rarr;</a>
+          </div>`;
+        }
+      }
+
+      function getAggregateWishlistKey() {
+        const short = province.shortName.replace(/市$/, '');
+        for (const w of WISHLIST_CITIES) {
+          if (String(w.adcode) === String(adcode) && w.name === short) {
+            return `${w.adcode}_${w.name.toLowerCase()}`;
+          }
+        }
+        return null;
+      }
+
+      app.innerHTML = `
+        <div class="province-hero">
+          <span class="province-tag">PROVINCE</span>
+          <h1 class="province-name-en">${province.enName.toUpperCase()}</h1>
+          <p class="province-name-cn">${province.name}</p>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-value">${total}</div>
+            <div class="stat-label">TOTAL CITIES</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value neon">${footprintCount}</div>
+            <div class="stat-label">足迹</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${pct}%</div>
+            <div class="stat-label">COVERAGE</div>
+          </div>
+        </div>
+
+        ${citySummaryHTML}
+
+        <div class="province-map-container">
+          <svg id="provinceMap" viewBox="0 0 ${mapW} ${mapH}" xmlns="http://www.w3.org/2000/svg">
+            ${boundaryPaths}
+            ${cityLabels}
+          </svg>
+        </div>
+
+        <div class="cities-header">
+          <span class="cities-header-label">${isMunicipality ? 'DISTRICTS' : 'CITIES'} — 足迹${isMunicipality ? '区域' : '城市'}可点击查看详情</span>
+          <div class="cities-header-line"></div>
+        </div>
+        <div class="cities-grid">${cityCards}</div>
+      `;
+    }
+
+    document.title = 'MOB1S | ' + province.shortName;
+    await render();
+  </script>
+</body>
+</html>

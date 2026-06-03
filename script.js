@@ -764,13 +764,17 @@ async function initMyMap() {
     var count = getTraveledCount();
     var pct = Math.round((count / 34) * 100);
     var countEls = document.querySelectorAll('[data-stat="mapProvinceCount"]');
-    var barEl = document.getElementById('mapProgressBar');
-    var pctEl = document.getElementById('mapPercent');
+    var barEls = document.querySelectorAll('[data-stat="mapProgressBar"]');
+    var pctEls = document.querySelectorAll('[data-stat="mapPercent"]');
     for (var i = 0; i < countEls.length; i++) {
       countEls[i].innerHTML = count + '<span class="unit">/34</span>';
     }
-    if (barEl) barEl.style.width = pct + '%';
-    if (pctEl) pctEl.textContent = pct + '%';
+    for (var i = 0; i < barEls.length; i++) {
+      barEls[i].style.width = pct + '%';
+    }
+    for (var i = 0; i < pctEls.length; i++) {
+      pctEls[i].textContent = pct + '%';
+    }
   }
 
   // Render province paths

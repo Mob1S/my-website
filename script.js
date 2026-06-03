@@ -763,10 +763,12 @@ async function initMyMap() {
   function updateStatsUI() {
     var count = getTraveledCount();
     var pct = Math.round((count / 34) * 100);
-    var countEl = document.getElementById('mapProvinceCount');
+    var countEls = document.querySelectorAll('[data-stat="mapProvinceCount"]');
     var barEl = document.getElementById('mapProgressBar');
     var pctEl = document.getElementById('mapPercent');
-    if (countEl) countEl.innerHTML = count + '<span class="unit">/34</span>';
+    for (var i = 0; i < countEls.length; i++) {
+      countEls[i].innerHTML = count + '<span class="unit">/34</span>';
+    }
     if (barEl) barEl.style.width = pct + '%';
     if (pctEl) pctEl.textContent = pct + '%';
   }

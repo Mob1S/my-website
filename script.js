@@ -321,7 +321,19 @@ function animateLoop(timestamp) {
   maskY += (targetMaskY - maskY) * 0.08;
 
   if (layerTop) {
-    if (maskVisible && !maskSuspended && !maskSuppressedByArea) {
+    // Check if mask circle overlaps terminal — if so, suppress to keep terminal carbon-only
+    var maskOverlapsTerminal = false;
+    if (maskVisible && !maskSuspended) {
+      var chatTerm = document.querySelector('.layer-top .chat-terminal');
+      if (chatTerm) {
+        var termRect = chatTerm.getBoundingClientRect();
+        var r = 60;
+        maskOverlapsTerminal = maskX > termRect.left - r && maskX < termRect.right + r &&
+                               maskY > termRect.top - r && maskY < termRect.bottom + r;
+      }
+    }
+
+    if (maskVisible && !maskSuspended && !maskSuppressedByArea && !maskOverlapsTerminal) {
       var adjustedY = maskY + window.scrollY;
       var maskVal = 'radial-gradient(circle 60px at ' + maskX.toFixed(1) + 'px ' + adjustedY.toFixed(1) + 'px, transparent 60px, black 60px)';
       layerTop.style.webkitMaskImage = maskVal;
@@ -393,9 +405,20 @@ async function sendMessage(text) {
   chatHistory.push({ role: 'user', content: text });
   if (chatInput) chatInput.value = '';
 
-  setTypingIndicator(true);
   if (chatInput) chatInput.disabled = true;
   if (chatSendBtn) chatSendBtn.disabled = true;
+
+  // Create a streaming bot message line
+  var streamLine = document.createElement('div');
+  streamLine.className = 'term-line bot streaming';
+  var streamPrompt = document.createElement('span');
+  streamPrompt.className = 'term-prompt';
+  streamPrompt.textContent = '>';
+  var streamSpan = document.createElement('span');
+  streamSpan.className = 'stream-text';
+  streamLine.appendChild(streamPrompt);
+  streamLine.appendChild(streamSpan);
+  if (chatMessages) { chatMessages.appendChild(streamLine); chatMessages.scrollTop = chatMessages.scrollHeight; }
 
   try {
     const response = await fetch(ChatConfig.apiEndpoint, {
@@ -404,22 +427,53 @@ async function sendMessage(text) {
       body: JSON.stringify(ChatConfig.buildPayload(chatHistory)),
     });
 
-    setTypingIndicator(false);
-
     if (!response.ok) {
+      streamLine.remove();
       var errData;
       try { errData = await response.json(); } catch (e) { errData = {}; }
       addChatMessage(errData.error || 'AI 服务暂时不可用，稍后再试吧。', 'bot');
     } else {
-      var data = await response.json();
-      var reply = ChatConfig.parseResponse(data);
-      if (reply) {
-        addChatMessage(reply, 'bot');
-        chatHistory.push({ role: 'assistant', content: reply });
+      // Read SSE stream
+      var reader = response.body.getReader();
+      var decoder = new TextDecoder();
+      var buffer = '';
+      var fullReply = '';
+
+      while (true) {
+        var { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        var lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (var i = 0; i < lines.length; i++) {
+          var line = lines[i];
+          if (line.startsWith('data: ')) {
+            var data = line.slice(6);
+            if (data === '[DONE]') continue;
+            try {
+              var json = JSON.parse(data);
+              var delta = json.choices?.[0]?.delta;
+              var chunk = delta?.content || '';
+              if (chunk) {
+                fullReply += chunk;
+                streamSpan.textContent = fullReply;
+                if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
+              }
+            } catch (e) { /* skip unparseable chunks */ }
+          }
+        }
+      }
+
+      // Streaming done — finalize
+      streamLine.classList.remove('streaming');
+      if (fullReply) {
+        chatHistory.push({ role: 'assistant', content: fullReply });
       }
     }
   } catch (err) {
-    setTypingIndicator(false);
+    streamLine.remove();
     addChatMessage('网络错误，请检查后端是否启动。', 'bot');
   }
 

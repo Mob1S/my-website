@@ -141,6 +141,7 @@ app.post('/api/chat', async (req, res) => {
         messages: fullMessages,
         temperature: 0.85,
         max_tokens: 800,
+        stream: true,
       }),
     });
 
@@ -150,12 +151,49 @@ app.post('/api/chat', async (req, res) => {
       return res.status(response.status).json({ error: 'AI service error. Please try again.' });
     }
 
-    const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content || '';
-    res.json({ reply });
+    // Stream the SSE response directly to the client
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') {
+              res.write('data: [DONE]\n\n');
+              continue;
+            }
+            // Forward the SSE data as-is
+            res.write(line + '\n\n');
+          }
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
+
+    res.end();
   } catch (err) {
     console.error('[Proxy Error]', err.message);
-    res.status(500).json({ error: 'Proxy error. Please try again.' });
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Proxy error. Please try again.' });
+    } else {
+      res.end();
+    }
   }
 });
 

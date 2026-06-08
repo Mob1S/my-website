@@ -1,5 +1,26 @@
 # 更新日志
 
+## v1.5.0 — 2026-06-08 — AI 后端加固 & 云端部署
+
+### 修复
+- **AI 聊天超时** — 移除 `req.on('close')` 监听器，curl/Nginx 发送完请求体后会触发 close，导致上游 MIMO API 请求被过早取消
+- **`/api/*` 路由被静态文件拦截** — `express.static` 注册顺序移到 API 路由之后
+
+### 新增
+- **健康检查** `GET /api/health` — 服务状态、模型名、运行时长
+- **请求超时保护** 60s — AbortController 防止 AI 接口无响应时连接挂死
+- **优雅关闭** — 响应 SIGTERM/SIGINT，PM2 重启不丢请求
+- **进程崩溃保护** — 捕获 uncaughtException / unhandledRejection
+- **前端自动重试** — 5xx 或网络异常时重连 2 次，间隔 2s
+- **Nginx 配置** `nginx.conf` — SSE 流式响应专用代理配置
+- **PM2 配置** `ecosystem.config.js` — 崩溃自动重启，256M 内存限制
+- **一键 Nginx 脚本** `setup-nginx.sh` — 兼容宝塔 / Ubuntu / CentOS
+
+### 安全
+- `.gitignore` 忽略 `server.js`、`.env`、`.claude/`、`.superpowers/`（含 API Key 和个人数据）
+
+---
+
 ## v1.4.1 — AI 流式输出 & 终端遮罩保护
 
 ### 新增

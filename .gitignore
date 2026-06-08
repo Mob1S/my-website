@@ -1,3 +1,12 @@
+# Sensitive files (contains API keys, personal data)
+server.js
+.env
+.env.*
+
+# IDE / Editor
+.claude/
+.superpowers/
+
 # Downloaded tools
 ai-website-cloner-template-0.3.1/
 anime-4.4.1/
@@ -8,4 +17,3 @@ presentation.html
 # Runtime
 node_modules/
 logs/
-.env

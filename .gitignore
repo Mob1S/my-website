@@ -4,3 +4,8 @@ anime-4.4.1/
 
 # Generated assets
 presentation.html
+
+# Runtime
+node_modules/
+logs/
+.env

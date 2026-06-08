@@ -8,12 +8,22 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static('.'));
+// 注意: express.static 放在 API 路由后面注册
+// 这样 /api/* 请求优先匹配路由，不会被静态文件中间件拦截
 
 const API_KEY = process.env.MIMO_API_KEY;
 const BASE_URL = process.env.MIMO_BASE_URL || 'https://api.xiaomimimo.com/v1';
 const MODEL = process.env.MIMO_MODEL || 'mimo-v2.5-pro';
 const PORT = process.env.PORT || 3001;
+const REQUEST_TIMEOUT = 60000; // 60s timeout for AI requests
+
+// Prevent process crash from unhandled errors
+process.on('uncaughtException', (err) => {
+  console.error('[FATAL] Uncaught exception:', err.message);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('[FATAL] Unhandled rejection:', reason);
+});
 
 // ============================================================
 // Mob1S Persona — System Prompt
@@ -53,7 +63,7 @@ const SYSTEM_PROMPT = `你是 Mob1S，一个20岁的通信工程专业大学生�
 - 称呼必须与关系匹配，不能对不熟的人叫"宝宝"或"陛下"
 
 ## 对话启动规则
-1. 你的第一条消息必须是"你好，你是谁？"——不跳过，不假设身份
+1. 你的第一条消息必须是"你好，哪位？"——不跳过，不假设身份
 2. 对方自报身份 → 在人物档案中匹配 → 用对应的称呼和互动风格
 3. 匹配不到 → 泛式关系（亲密度5），保持礼貌边界
 4. 对方拒绝自报 → 泛式关系对话
@@ -104,12 +114,17 @@ const SYSTEM_PROMPT = `你是 Mob1S，一个20岁的通信工程专业大学生�
 - 朋友炫耀成就时：短促惊讶+精准重复关键数据+认可收尾，不自我比较不拆台`;
 
 // ============================================================
-// Routes
+// Routes — 顺序很重要！API 路由 > 静态文件 > 兜底
 // ============================================================
 
-// Serve static files
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
+// Health check — Nginx upstream探活 & 监控
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    model: MODEL,
+    apiKey: API_KEY ? 'configured' : 'missing',
+    uptime: Math.floor(process.uptime()),
+  });
 });
 
 // Chat API
@@ -129,8 +144,16 @@ app.post('/api/chat', async (req, res) => {
     ...messages,
   ];
 
+  // Abort controller for request timeout
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
+  // If client disconnects, abort the upstream request
+  req.on('close', () => controller.abort());
+
   try {
     const response = await fetch(`${BASE_URL}/chat/completions`, {
+      signal: controller.signal,
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${API_KEY}`,
@@ -188,20 +211,56 @@ app.post('/api/chat', async (req, res) => {
 
     res.end();
   } catch (err) {
-    console.error('[Proxy Error]', err.message);
-    if (!res.headersSent) {
-      res.status(500).json({ error: 'Proxy error. Please try again.' });
+    if (err.name === 'AbortError') {
+      console.error('[Timeout] Request aborted (client disconnect or 60s timeout)');
+      if (!res.headersSent) {
+        res.status(504).json({ error: 'AI response timed out, please try again.' });
+      } else {
+        res.end();
+      }
     } else {
-      res.end();
+      console.error('[Proxy Error]', err.message);
+      if (!res.headersSent) {
+        res.status(500).json({ error: 'Proxy error. Please try again.' });
+      } else {
+        res.end();
+      }
     }
+  } finally {
+    clearTimeout(timeout);
   }
+});
+
+// ============================================================
+// Static files & SPA fallback — 必须在 API 路由之后
+// ============================================================
+app.use(express.static('.'));
+app.get('*', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
 });
 
 // ============================================================
 // Start
 // ============================================================
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`[MOB1S] Chat server running on http://localhost:${PORT}`);
   console.log(`[MOB1S] Model: ${MODEL}`);
   console.log(`[MOB1S] API Key: ${API_KEY ? 'configured ✓' : 'MISSING — set MIMO_API_KEY in .env'}`);
+  console.log(`[MOB1S] Health check: http://localhost:${PORT}/api/health`);
 });
+
+// Graceful shutdown — PM2 / Docker / systemd send SIGTERM
+function shutdown(signal) {
+  console.log(`\n[MOB1S] Received ${signal}, shutting down gracefully...`);
+  server.close(() => {
+    console.log('[MOB1S] Server closed.');
+    process.exit(0);
+  });
+  // Force exit after 10s if connections won't drain
+  setTimeout(() => {
+    console.error('[MOB1S] Forced exit after timeout.');
+    process.exit(1);
+  }, 10000);
+}
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));

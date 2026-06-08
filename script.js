@@ -13,7 +13,10 @@ console.log('[MOB1S] Engine starting...');
    ============================================= */
 const ChatConfig = {
   apiEndpoint: '/api/chat',
+  healthEndpoint: '/api/health',
   enabled: true,
+  maxRetries: 2,
+  retryDelay: 2000,
   buildPayload(messages) { return { messages }; },
   parseResponse(data) { return data?.reply || ''; },
 };
@@ -399,6 +402,9 @@ function enableChatInputs() {
   if (sysStatus) { sysStatus.textContent = 'ONLINE'; sysStatus.style.color = 'var(--neon)'; sysStatus.style.animation = 'none'; }
 }
 
+// Helper: delay for retry
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
 async function sendMessage(text) {
   if (!text.trim()) return;
   addChatMessage(text, 'user');
@@ -420,19 +426,31 @@ async function sendMessage(text) {
   streamLine.appendChild(streamSpan);
   if (chatMessages) { chatMessages.appendChild(streamLine); chatMessages.scrollTop = chatMessages.scrollHeight; }
 
-  try {
-    const response = await fetch(ChatConfig.apiEndpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(ChatConfig.buildPayload(chatHistory)),
-    });
+  var lastErr = null;
+  for (var attempt = 0; attempt <= ChatConfig.maxRetries; attempt++) {
+    if (attempt > 0) {
+      streamSpan.textContent = `重连中(${attempt}/${ChatConfig.maxRetries})...`;
+      await delay(ChatConfig.retryDelay);
+    }
 
-    if (!response.ok) {
-      streamLine.remove();
-      var errData;
-      try { errData = await response.json(); } catch (e) { errData = {}; }
-      addChatMessage(errData.error || 'AI 服务暂时不可用，稍后再试吧。', 'bot');
-    } else {
+    try {
+      const response = await fetch(ChatConfig.apiEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(ChatConfig.buildPayload(chatHistory)),
+      });
+
+      if (!response.ok) {
+        var errData;
+        try { errData = await response.json(); } catch (e) { errData = {}; }
+        lastErr = errData.error || 'AI 服务暂时不可用';
+        // 5xx = server error → retry; 4xx = client error → no retry
+        if (response.status >= 500 && attempt < ChatConfig.maxRetries) continue;
+        streamLine.remove();
+        addChatMessage(lastErr, 'bot');
+        break;
+      }
+
       // Read SSE stream
       var reader = response.body.getReader();
       var decoder = new TextDecoder();
@@ -471,10 +489,18 @@ async function sendMessage(text) {
       if (fullReply) {
         chatHistory.push({ role: 'assistant', content: fullReply });
       }
+      lastErr = null;
+      break;
+    } catch (err) {
+      lastErr = err;
+      if (attempt < ChatConfig.maxRetries) continue;
     }
-  } catch (err) {
+  }
+
+  // All retries exhausted
+  if (lastErr) {
     streamLine.remove();
-    addChatMessage('网络错误，请检查后端是否启动。', 'bot');
+    addChatMessage('网络错误，AI 服务连接失败，请稍后再试。', 'bot');
   }
 
   if (chatInput) chatInput.disabled = false;

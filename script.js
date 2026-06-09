@@ -184,6 +184,37 @@ let maskSuspended = false; // true when easter egg modal is open
 let maskSuppressedByArea = false; // true when over map or chat areas
 let maskInitialized = false;
 
+// F1 car mask — direction tracking
+let prevMaskXSmooth = window.innerWidth / 2;
+let prevMaskYSmooth = window.innerHeight / 2;
+let maskAngle = 0;
+
+// F1 car mask — SVG path with rotation via data URI
+var CAR_NOSE = {x:237, y:58};
+var SVG_VB_W = 1758, SVG_VB_H = 693;
+var CAR_MASK_SCALE = 0.21;
+var CAR_CVS = 600; // fixed viewport, large enough for any rotation
+var f1PathD = '';
+var carMaskUrl = '';
+var lastCarAngle = null;
+
+fetch('F1_SVG_wb.svg').then(function(r){ return r.text(); }).then(function(txt) {
+  var m = txt.match(/\bd="([^"]+)"/);
+  if (m) f1PathD = m[1];
+});
+
+function buildCarMaskUrl(angleDeg) {
+  if (!f1PathD) return null;
+  var s = CAR_MASK_SCALE;
+  var cx = CAR_NOSE.x * SVG_VB_W / 300;
+  var cy = CAR_NOSE.y * SVG_VB_H / 118;
+  // nose at viewport center, rotate around it, then scale
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + CAR_CVS + '" height="' + CAR_CVS + '">' +
+    '<g transform="translate(' + (CAR_CVS/2) + ',' + (CAR_CVS/2) + ') rotate(' + angleDeg + ') scale(' + s + ') translate(' + (-cx) + ',' + (-cy) + ')">' +
+    '<path d="' + f1PathD + '" fill="white"/></g></svg>';
+  return 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")';
+}
+
 document.addEventListener('mousemove', function(e) {
   maskVisible = true;
 
@@ -325,18 +356,26 @@ function animateLoop(timestamp) {
     renderer.render(scene, camera);
   }
 
-  // === Mask reveal update ===
+  // === Mask reveal update (F1 car shape) ===
   maskX += (targetMaskX - maskX) * 0.08;
   maskY += (targetMaskY - maskY) * 0.08;
 
+  // Direction angle from smoothed velocity
+  var dmx = maskX - prevMaskXSmooth;
+  var dmy = maskY - prevMaskYSmooth;
+  if (Math.abs(dmx) > 1 || Math.abs(dmy) > 1) {
+    maskAngle = Math.atan2(dmy, dmx) * 180 / Math.PI;
+  }
+  prevMaskXSmooth = maskX;
+  prevMaskYSmooth = maskY;
+
   if (layerTop) {
-    // Check if mask circle overlaps terminal — if so, suppress to keep terminal carbon-only
     var maskOverlapsTerminal = false;
     if (maskVisible && !maskSuspended) {
       var chatTerm = document.querySelector('.layer-top .chat-terminal');
       if (chatTerm) {
         var termRect = chatTerm.getBoundingClientRect();
-        var r = 60;
+        var r = 150;
         maskOverlapsTerminal = maskX > termRect.left - r && maskX < termRect.right + r &&
                                maskY > termRect.top - r && maskY < termRect.bottom + r;
       }
@@ -344,9 +383,27 @@ function animateLoop(timestamp) {
 
     if (maskVisible && !maskSuspended && !maskSuppressedByArea && !maskOverlapsTerminal) {
       var adjustedY = maskY + window.scrollY;
-      var maskVal = 'radial-gradient(circle 60px at ' + maskX.toFixed(1) + 'px ' + adjustedY.toFixed(1) + 'px, transparent 60px, black 60px)';
-      layerTop.style.webkitMaskImage = maskVal;
-      layerTop.style.maskImage = maskVal;
+      // Rebuild mask URL only when angle changes
+      if (lastCarAngle === null || Math.abs(maskAngle - lastCarAngle) > 0.1) {
+        carMaskUrl = buildCarMaskUrl(maskAngle);
+        lastCarAngle = maskAngle;
+      }
+      if (carMaskUrl) {
+        // nose is at SVG center (CAR_CVS/2), so offset by half
+        var posX = (maskX - CAR_CVS / 2).toFixed(1) + 'px';
+        var posY = (adjustedY - CAR_CVS / 2).toFixed(1) + 'px';
+        var img = 'linear-gradient(black,black),' + carMaskUrl;
+        layerTop.style.webkitMaskImage = img;
+        layerTop.style.maskImage = img;
+        layerTop.style.webkitMaskComposite = 'xor';
+        layerTop.style.maskComposite = 'subtract';
+        layerTop.style.webkitMaskSize = 'auto,' + CAR_CVS + 'px ' + CAR_CVS + 'px';
+        layerTop.style.maskSize = 'auto,' + CAR_CVS + 'px ' + CAR_CVS + 'px';
+        layerTop.style.webkitMaskPosition = '0 0,' + posX + ' ' + posY;
+        layerTop.style.maskPosition = '0 0,' + posX + ' ' + posY;
+        layerTop.style.webkitMaskRepeat = 'no-repeat';
+        layerTop.style.maskRepeat = 'no-repeat';
+      }
     } else {
       layerTop.style.webkitMaskImage = 'none';
       layerTop.style.maskImage = 'none';
@@ -707,6 +764,14 @@ function initScrollAnimations() {
     maskSuspended = true;
     layerTop.style.webkitMaskImage = 'none';
     layerTop.style.maskImage = 'none';
+    layerTop.style.webkitMaskComposite = '';
+    layerTop.style.maskComposite = '';
+    layerTop.style.webkitMaskSize = '';
+    layerTop.style.maskSize = '';
+    layerTop.style.webkitMaskPosition = '';
+    layerTop.style.maskPosition = '';
+    layerTop.style.webkitMaskRepeat = '';
+    layerTop.style.maskRepeat = '';
     modalOverlay.classList.add('active');
   }
 

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>F1 赛车标注工具</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #1a1a2e; color: #eee; font-family: monospace; padding: 20px; }
+h1 { font-size: 18px; margin-bottom: 10px; color: #0ff; }
+.instructions { font-size: 13px; color: #aaa; margin-bottom: 15px; line-height: 1.6; }
+.instructions b { color: #0ff; }
+.canvas-wrap { position: relative; display: inline-block; border: 2px solid #333; cursor: crosshair; }
+canvas { display: block; }
+.info { margin-top: 15px; font-size: 13px; line-height: 1.8; }
+.info span { color: #0f0; }
+.btns { margin-top: 10px; }
+.btns button { padding: 6px 16px; margin-right: 8px; cursor: pointer; font-family: monospace; font-size: 13px; border: 1px solid #555; background: #222; color: #eee; }
+.btns button:hover { background: #333; }
+#output { margin-top: 15px; padding: 10px; background: #111; border: 1px solid #333; font-size: 12px; white-space: pre; color: #0f0; min-height: 40px; }
+</style>
+</head>
+<body>
+
+<h1>F1 赛车标注工具</h1>
+<div class="instructions">
+  <b>第一步：</b>拖拽框选车体范围（白色区域只保留框内的）<br>
+  <b>第二步：</b>点击标出车头（鼻尖）位置<br>
+  <b>第三步：</b>点"生成代码"复制到 script.js
+</div>
+
+<div class="canvas-wrap">
+  <canvas id="c"></canvas>
+</div>
+
+<div class="info">
+  车体框选: <span id="boxInfo">未框选</span><br>
+  车头位置: <span id="noseInfo">未标注</span>
+</div>
+
+<div class="btns">
+  <button onclick="resetAll()">重置</button>
+  <button onclick="generateCode()">生成代码</button>
+</div>
+
+<div id="output"></div>
+
+<script>
+var img = new Image();
+img.src = 'F1_SVG_wb.svg';
+var canvas = document.getElementById('c');
+var ctx = canvas.getContext('2d');
+
+var step = 0; // 0=box, 1=nose
+var box = null; // {x1,y1,x2,y2}
+var nose = null; // {x,y}
+var dragging = false;
+var dragStart = null;
+
+img.onload = function() {
+  canvas.width = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+  redraw();
+};
+
+function redraw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // Checkerboard background to show transparency
+  var sz = 16;
+  for (var y = 0; y < canvas.height; y += sz) {
+    for (var x = 0; x < canvas.width; x += sz) {
+      ctx.fillStyle = ((x/sz + y/sz) % 2 === 0) ? '#2a2a3e' : '#222236';
+      ctx.fillRect(x, y, sz, sz);
+    }
+  }
+  ctx.drawImage(img, 0, 0);
+
+  // Draw box
+  if (box) {
+    ctx.strokeStyle = '#0ff';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 4]);
+    ctx.strokeRect(box.x1, box.y1, box.x2 - box.x1, box.y2 - box.y1);
+    ctx.setLineDash([]);
+    // Label
+    ctx.fillStyle = '#0ff';
+    ctx.font = '14px monospace';
+    ctx.fillText('车体范围', box.x1 + 4, box.y1 - 6);
+  }
+
+  // Draw nose
+  if (nose) {
+    ctx.beginPath();
+    ctx.arc(nose.x, nose.y, 8, 0, Math.PI * 2);
+    ctx.strokeStyle = '#f0f';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // Crosshair
+    ctx.beginPath();
+    ctx.moveTo(nose.x - 14, nose.y); ctx.lineTo(nose.x + 14, nose.y);
+    ctx.moveTo(nose.x, nose.y - 14); ctx.lineTo(nose.x, nose.y + 14);
+    ctx.strokeStyle = 'rgba(255,0,255,0.5)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = '#f0f';
+    ctx.font = '14px monospace';
+    ctx.fillText('车头', nose.x + 12, nose.y - 8);
+  }
+}
+
+canvas.addEventListener('mousedown', function(e) {
+  var r = canvas.getBoundingClientRect();
+  var x = e.clientX - r.left;
+  var y = e.clientY - r.top;
+
+  if (step === 0) {
+    dragging = true;
+    dragStart = {x: x, y: y};
+  } else if (step === 1) {
+    nose = {x: Math.round(x), y: Math.round(y)};
+    document.getElementById('noseInfo').textContent = 'x=' + nose.x + ', y=' + nose.y;
+    step = 2;
+    redraw();
+  }
+});
+
+canvas.addEventListener('mousemove', function(e) {
+  if (!dragging) return;
+  var r = canvas.getBoundingClientRect();
+  var x = e.clientX - r.left;
+  var y = e.clientY - r.top;
+  box = {
+    x1: Math.min(dragStart.x, x), y1: Math.min(dragStart.y, y),
+    x2: Math.max(dragStart.x, x), y2: Math.max(dragStart.y, y)
+  };
+  redraw();
+});
+
+canvas.addEventListener('mouseup', function(e) {
+  if (!dragging) return;
+  dragging = false;
+  if (box && (box.x2 - box.x1) > 5 && (box.y2 - box.y1) > 5) {
+    document.getElementById('boxInfo').textContent =
+      'x=' + Math.round(box.x1) + ', y=' + Math.round(box.y1) +
+      ' → x=' + Math.round(box.x2) + ', y=' + Math.round(box.y2) +
+      ' (' + Math.round(box.x2-box.x1) + '×' + Math.round(box.y2-box.y1) + ')';
+    step = 1;
+  } else {
+    box = null;
+    redraw();
+  }
+});
+
+function resetAll() {
+  box = null; nose = null; step = 0;
+  document.getElementById('boxInfo').textContent = '未框选';
+  document.getElementById('noseInfo').textContent = '未标注';
+  document.getElementById('output').textContent = '';
+  redraw();
+}
+
+function generateCode() {
+  if (!box || !nose) {
+    document.getElementById('output').textContent = '请先完成框选和车头标注！';
+    return;
+  }
+  var svgW = img.naturalWidth;
+  var svgH = img.naturalHeight;
+  var code =
+    '// F1 car body bounds in SVG coords\n' +
+    'var CAR_BODY = {x1:' + Math.round(box.x1) + ',y1:' + Math.round(box.y1) +
+    ',x2:' + Math.round(box.x2) + ',y2:' + Math.round(box.y2) + '};\n' +
+    '// Nose position in SVG coords  \n' +
+    'var CAR_NOSE = {x:' + nose.x + ',y:' + nose.y + '};\n' +
+    'var SVG_W = ' + svgW + ', SVG_H = ' + svgH + ';';
+  document.getElementById('output').textContent = code;
+  // Copy to clipboard
+  navigator.clipboard.writeText(code).catch(function(){});
+}
+</script>
+</body>
+</html>

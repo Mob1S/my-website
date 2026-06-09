@@ -17,3 +17,6 @@ presentation.html
 # Runtime
 node_modules/
 logs/
+
+#脚本
+setup-nginx.sh

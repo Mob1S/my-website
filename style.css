@@ -1031,10 +1031,20 @@ body {
 .map-container {
   position: relative;
   width: 100%;
+  aspect-ratio: 900 / 850;
   background: var(--carbon-card);
   border: 1px solid var(--border-subtle);
   border-radius: 2px;
   overflow: hidden;
+}
+
+/* Hide scrollbar to keep body width equal to viewport width,
+   preventing layout desync between the two layers. */
+html {
+  scrollbar-width: none; /* Firefox */
+}
+html::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
 }
 
 #chinaMap {
@@ -1426,6 +1436,24 @@ body {
   border: 1px solid var(--border-hairline);
   padding: 0.2rem 0.6rem;
   border-radius: 1px;
+}
+
+.footer-center {
+  display: flex;
+  align-items: center;
+}
+
+.footer-icp {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--titanium-dim);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  transition: color 0.2s;
+}
+
+.footer-icp:hover {
+  color: var(--neon);
 }
 
 /* =============================================

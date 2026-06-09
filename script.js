@@ -24,7 +24,7 @@ const ChatConfig = {
 // Conversation history (role-based, sent to backend)
 // Starts with bot's protocol greeting so every request includes full context
 let chatHistory = [
-  { role: 'assistant', content: '你好，你是谁？' },
+  { role: 'assistant', content: '你好，哪位？' },
 ];
 
 // Track if user has identified themselves to avoid re-asking
@@ -146,6 +146,12 @@ if (canvas && typeof THREE.WebGLRenderer === 'function') {
 
   bottomInner.setAttribute('aria-hidden', 'true');
   console.log('[Clone] Content cloned to bottom layer');
+
+  // Force re-sync after navigation (Live Server / bfcache)
+  window.addEventListener('pageshow', function() {
+    var inner = document.getElementById('layerBottomInner');
+    if (inner) inner.style.transform = 'translateY(' + (-window.scrollY).toFixed(1) + 'px)';
+  });
 })();
 
 /* =============================================

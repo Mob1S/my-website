@@ -27,6 +27,7 @@ export const TRAVELED_CITIES = {
   '310000_shanghai': { name: '上海', province: '上海市', aggregate: true, days: '5', year: '2024' },
   '310000_minhang': { name: '闵行', province: '上海市' },
   '310000_huangpu': { name: '黄浦', province: '上海市' },
+  '310000_xuhui': { name: '徐汇', province: '上海市' },
   '310000_songjiang': { name: '松江', province: '上海市' },
   '320000_suzhou': { name: '苏州', province: '江苏省' },
   '320000_nanjing': { name: '南京', province: '江苏省' },

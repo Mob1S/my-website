@@ -192,7 +192,7 @@ let maskAngle = 0;
 // F1 car mask — SVG path with rotation via data URI
 var CAR_NOSE = {x:237, y:58};
 var SVG_VB_W = 1758, SVG_VB_H = 693;
-var CAR_MASK_SCALE = 0.21;
+var CAR_MASK_SCALE = 0.21; // default; reduced to 0.11 over track
 var CAR_CVS = 600; // fixed viewport, large enough for any rotation
 var f1PathD = '';
 var carMaskUrl = '';
@@ -383,7 +383,16 @@ function animateLoop(timestamp) {
 
     if (maskVisible && !maskSuspended && !maskSuppressedByArea && !maskOverlapsTerminal) {
       var adjustedY = maskY + window.scrollY;
-      // Rebuild mask URL only when angle changes
+      // Smaller over track area, larger elsewhere
+      var trackSvg = document.querySelector('.monza-track');
+      var overTrack = false;
+      if (trackSvg) {
+        var tr = trackSvg.getBoundingClientRect();
+        overTrack = maskX >= tr.left && maskX <= tr.right && maskY >= tr.top && maskY <= tr.bottom;
+      }
+      var newScale = overTrack ? 0.11 : 0.21;
+      if (newScale !== CAR_MASK_SCALE) { CAR_MASK_SCALE = newScale; lastCarAngle = null; }
+      // Rebuild mask URL when angle or scale changes
       if (lastCarAngle === null || Math.abs(maskAngle - lastCarAngle) > 0.1) {
         carMaskUrl = buildCarMaskUrl(maskAngle);
         lastCarAngle = maskAngle;

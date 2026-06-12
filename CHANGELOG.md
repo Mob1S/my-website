@@ -11,6 +11,10 @@
 
 ### 变更
 - Hero 副标题恢复为英文 "Full send. No lift. Always pushing the limit."
+- 赛道区域内遮罩缩小至 0.11，其他区域保持 0.21
+
+### 修复
+- `DOMRect.contains()` 不存在导致遮罩渲染中断 — 改为手动边界判断
 
 ---
 

@@ -14,10 +14,10 @@
   --neon-ghost: rgba(191, 255, 0, 0.06);
   --amber: #ff8c00;
   --amber-dim: rgba(255, 140, 0, 0.2);
-  --titanium: #a0a0aa;
-  --titanium-dim: #5a5a66;
+  --titanium: #b0b0ba;
+  --titanium-dim: #6a6a76;
   --white: #e8e8ec;
-  --white-dim: #90909a;
+  --white-dim: #a0a0aa;
   --border-hairline: rgba(255, 255, 255, 0.05);
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-active: rgba(191, 255, 0, 0.25);
@@ -37,7 +37,7 @@ body {
   font-family: var(--font-mono);
   background: var(--carbon);
   color: var(--white);
-  line-height: 1.7;
+  line-height: 1.75;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -569,8 +569,8 @@ body {
 }
 .track-egg-modal p {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  line-height: 1.8;
+  font-size: 0.82rem;
+  line-height: 1.85;
   color: var(--titanium);
 }
 .track-egg-modal .egg-emoji {
@@ -694,9 +694,10 @@ body {
 }
 
 .intro-body {
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   color: var(--white-dim);
-  line-height: 1.85;
+  line-height: 1.9;
+  letter-spacing: 0.01em;
 }
 
 /* Telemetry card */
@@ -889,11 +890,12 @@ body {
 }
 
 .panel-desc {
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   color: var(--white-dim);
-  line-height: 1.8;
+  line-height: 1.85;
   margin-bottom: 1.5rem;
   max-width: 600px;
+  letter-spacing: 0.01em;
 }
 
 .panel-drivers {
@@ -1400,10 +1402,12 @@ html::-webkit-scrollbar {
   position: relative;
   z-index: 2;
   border-top: 1px solid var(--border-hairline);
-  padding: 1.5rem 2.5rem;
+  padding: 1.25rem 2.5rem 0.75rem;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 0.5rem;
 }
 
 .footer-left,
@@ -1454,6 +1458,20 @@ html::-webkit-scrollbar {
 
 .footer-icp:hover {
   color: var(--neon);
+}
+
+.footer-disclaimer {
+  width: 100%;
+  text-align: center;
+  padding: 0.5rem 0 0.25rem;
+}
+
+.footer-disclaimer-text {
+  font-family: var(--font-mono);
+  font-size: 0.45rem;
+  color: var(--titanium-dim);
+  opacity: 0.5;
+  letter-spacing: 0.03em;
 }
 
 /* =============================================

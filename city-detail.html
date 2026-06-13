@@ -577,9 +577,15 @@
       }
     };
 
+    // HTML entity escape — prevent XSS from URL params
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
-    const cityName = params.get('name');
+    const cityName = escapeHTML(params.get('name'));
     let data = CITY_PROFILES[id] || DISTRICT_NOTES[id] || WISHLIST_IMPRESSIONS[id];
     const isDistrict = !CITY_PROFILES[id] && DISTRICT_NOTES[id];
     const isWishlist = !CITY_PROFILES[id] && !DISTRICT_NOTES[id] && WISHLIST_IMPRESSIONS[id];
@@ -608,7 +614,7 @@
       document.title = 'MOB1S | City Not Found';
     } else if (isGeneric) {
       // Generic impression page for any city passed via URL
-      const genProvince = params.get('province') || '';
+      const genProvince = escapeHTML(params.get('province'));
       document.title = 'MOB1S | ' + cityName;
       app.innerHTML = `
         <div class="city-hero">

@@ -1,22 +1,29 @@
-# Sensitive files (contains API keys, personal data)
-server.js
+# ========== 敏感文件 ==========
 .env
 .env.*
+server.js
 
-# IDE / Editor
+# ========== IDE / 编辑器 ==========
 .claude/
 .superpowers/
+.vscode/
 
-# Downloaded tools
+# ========== 下载的工具/库 ==========
 ai-website-cloner-template-0.3.1/
 anime-4.4.1/
+UsersmobisAppDataLocalnpm-cache/
 
-# Generated assets
-presentation.html
-
-# Runtime
+# ========== 运行时/缓存 ==========
 node_modules/
 logs/
 
-#脚本
+# ========== 服务器配置 ==========
+ecosystem.config.js
+nginx.conf
 setup-nginx.sh
+package.json
+package-lock.json
+
+# ========== 开发文档 ==========
+docs/
+presentation.html

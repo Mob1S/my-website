@@ -332,15 +332,11 @@
     }
 
     async function fetchCityBoundaries() {
+      // Use local GeoJSON files (no external API dependency)
+      // Taiwan uses separate file from OSM data
+      const file = adcode === '710000' ? 'data/taiwan-cities.json' : `data/${adcode}_full.json`;
       try {
-        const url = `https://geo.datav.aliyun.com/areas_v3/bound/${adcode}_full.json`;
-        const resp = await fetch(url);
-        if (resp.ok) return await resp.json();
-      } catch {}
-      // Aliyun API doesn't cover all provinces — fall back to local GeoJSON from OSM Overpass API
-      try {
-        const localUrl = `data/taiwan-cities.json`;
-        const resp = await fetch(localUrl);
+        const resp = await fetch(file);
         if (resp.ok) return await resp.json();
       } catch {}
       return null;

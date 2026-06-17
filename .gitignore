@@ -16,6 +16,9 @@ UsersmobisAppDataLocalnpm-cache/
 node_modules/
 logs/
 
+# ========== 用户图片 ==========
+images/
+
 # ========== 服务器配置 ==========
 ecosystem.config.js
 nginx.conf

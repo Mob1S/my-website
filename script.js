@@ -144,7 +144,12 @@ if (canvas && typeof THREE.WebGLRenderer === 'function') {
     bottomInner.appendChild(footerClone);
   }
 
+  // Disable focus on all cloned elements (aria-hidden + tabindex=-1)
   bottomInner.setAttribute('aria-hidden', 'true');
+  bottomInner.querySelectorAll('a, button, input, textarea, select, [tabindex]').forEach(function(el) {
+    el.setAttribute('tabindex', '-1');
+    el.setAttribute('aria-hidden', 'true');
+  });
   console.log('[Clone] Content cloned to bottom layer');
 
   // Force re-sync after navigation (Live Server / bfcache)

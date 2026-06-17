@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MOB1S DEV PANEL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --carbon: #0a0a0c;
+      --carbon-light: #111115;
+      --carbon-card: #14141a;
+      --neon: #bfff00;
+      --neon-dim: rgba(191, 255, 0, 0.12);
+      --neon-glow: rgba(191, 255, 0, 0.35);
+      --neon-ghost: rgba(191, 255, 0, 0.06);
+      --amber: #ff8c00;
+      --amber-dim: rgba(255, 140, 0, 0.2);
+      --titanium: #b0b0ba;
+      --titanium-dim: #6a6a76;
+      --white: #e8e8ec;
+      --white-dim: #a0a0aa;
+      --border-hairline: rgba(255, 255, 255, 0.05);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-active: rgba(191, 255, 0, 0.25);
+      --font-display: 'Orbitron', system-ui, sans-serif;
+      --font-mono: 'Space Mono', 'Consolas', monospace;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { background: var(--carbon); }
+    body {
+      font-family: var(--font-mono);
+      background: var(--carbon);
+      color: var(--white);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    /* Telemetry bar */
+    .tel-bar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.5rem 1.5rem;
+      background: rgba(10,10,12,0.95); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-hairline);
+      font-size: 0.6rem; letter-spacing: 0.08em;
+    }
+    .tel-bar .brand { font-family: var(--font-display); font-size: 0.8rem; font-weight: 800; letter-spacing: 0.2em; }
+    .tel-bar .accent { color: var(--neon); }
+    .tel-bar .status { color: var(--neon); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .tel-bar .logout-btn {
+      background: none; border: 1px solid var(--border-subtle); color: var(--titanium-dim);
+      font-family: var(--font-mono); font-size: 0.55rem; font-weight: 700;
+      letter-spacing: 0.1em; padding: 0.2rem 0.6rem; cursor: pointer;
+      transition: all 0.3s;
+    }
+    .tel-bar .logout-btn:hover { border-color: var(--amber); color: var(--amber); }
+
+    /* Layout */
+    .app { display: flex; padding-top: 2.5rem; min-height: 100vh; }
+    .sidebar {
+      width: 180px; flex-shrink: 0; padding: 2rem 1rem;
+      border-right: 1px solid var(--border-hairline);
+      position: sticky; top: 2.5rem; height: calc(100vh - 2.5rem);
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.5rem 0.6rem; margin-bottom: 0.3rem;
+      cursor: pointer; border-radius: 2px;
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em;
+      color: var(--titanium-dim); transition: all 0.3s;
+      text-transform: uppercase;
+    }
+    .nav-item::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--titanium-dim); flex-shrink: 0;
+      transition: all 0.3s;
+    }
+    .nav-item:hover { color: var(--white); }
+    .nav-item:hover::before { background: var(--white); }
+    .nav-item.active { color: var(--neon); }
+    .nav-item.active::before { background: var(--neon); box-shadow: 0 0 8px var(--neon-glow); }
+
+    .content { flex: 1; padding: 2rem 2.5rem; max-width: 900px; }
+
+    /* Section */
+    .section-header {
+      display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;
+    }
+    .section-index {
+      font-size: 0.55rem; font-weight: 700; letter-spacing: 0.25em;
+      color: var(--neon); padding: 0.2rem 0.5rem;
+      border: 1px solid var(--neon-dim); border-radius: 1px;
+    }
+    .section-title {
+      font-family: var(--font-display); font-size: 1.2rem; font-weight: 800;
+      letter-spacing: 0.05em; text-transform: uppercase;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--carbon-card); border: 1px solid var(--border-subtle);
+      border-radius: 2px; padding: 1.2rem; margin-bottom: 1rem;
+      transition: border-color 0.3s;
+    }
+    .card:hover { border-color: var(--border-active); }
+    .card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 1rem; padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+    .card-key {
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.15em;
+      color: var(--neon); padding: 0.15rem 0.4rem;
+      border: 1px solid var(--neon-dim); border-radius: 1px;
+    }
+    .card-actions { display: flex; gap: 0.5rem; }
+
+    /* Form elements */
+    label {
+      display: block; font-size: 0.55rem; font-weight: 700;
+      letter-spacing: 0.15em; color: var(--titanium-dim);
+      margin-bottom: 0.3rem; text-transform: uppercase;
+    }
+    input, textarea, select {
+      width: 100%; background: transparent;
+      border: 1px solid var(--border-hairline); border-radius: 1px;
+      color: var(--white); font-family: var(--font-mono); font-size: 0.75rem;
+      padding: 0.45rem 0.6rem; outline: none;
+      transition: border-color 0.3s;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--neon); }
+    textarea { resize: vertical; min-height: 60px; }
+    select { cursor: pointer; }
+    select option { background: var(--carbon-card); color: var(--white); }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 0.8rem; }
+    .form-group { margin-bottom: 0.8rem; }
+
+    /* Buttons */
+    .btn {
+      background: transparent; border: 1px solid var(--border-subtle);
+      color: var(--titanium-dim); font-family: var(--font-mono);
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em;
+      padding: 0.35rem 0.8rem; cursor: pointer; border-radius: 1px;
+      transition: all 0.3s; text-transform: uppercase;
+    }
+    .btn:hover { border-color: var(--neon); color: var(--neon); }
+    .btn-danger:hover { border-color: #ff4444; color: #ff4444; }
+    .btn-primary {
+      border-color: var(--neon-dim); color: var(--neon);
+      background: var(--neon-ghost);
+    }
+    .btn-primary:hover { background: var(--neon-dim); }
+
+    /* Tags input */
+    .tags-container {
+      display: flex; flex-wrap: wrap; gap: 0.4rem;
+      padding: 0.4rem; border: 1px solid var(--border-hairline);
+      border-radius: 1px; min-height: 36px;
+    }
+    .tag {
+      display: flex; align-items: center; gap: 0.3rem;
+      background: var(--neon-ghost); border: 1px solid var(--neon-dim);
+      padding: 0.15rem 0.4rem; border-radius: 1px;
+      font-size: 0.65rem; color: var(--neon);
+    }
+    .tag-remove {
+      cursor: pointer; color: var(--titanium-dim); font-size: 0.8rem;
+      line-height: 1; transition: color 0.2s;
+    }
+    .tag-remove:hover { color: #ff4444; }
+    .tags-input {
+      border: none !important; padding: 0.2rem !important;
+      flex: 1; min-width: 80px; font-size: 0.7rem !important;
+    }
+
+    /* Stats rows */
+    .stat-row {
+      display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.4rem;
+    }
+    .stat-row input { flex: 1; }
+    .stat-remove {
+      background: none; border: none; color: var(--titanium-dim);
+      cursor: pointer; font-size: 1rem; padding: 0.2rem;
+      transition: color 0.2s;
+    }
+    .stat-remove:hover { color: #ff4444; }
+
+    /* Image grid */
+    .image-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 0.8rem; margin-top: 1rem;
+    }
+    .image-card {
+      background: var(--carbon-card); border: 1px solid var(--border-subtle);
+      border-radius: 2px; overflow: hidden;
+    }
+    .image-card img {
+      width: 100%; height: 120px; object-fit: cover; display: block;
+    }
+    .image-card .image-info {
+      padding: 0.5rem;
+    }
+    .image-desc-input {
+      width: 100%; background: transparent; border: 1px solid transparent;
+      color: var(--white-dim); font-family: var(--font-mono); font-size: 0.65rem;
+      padding: 0.2rem 0.3rem; outline: none; border-radius: 1px;
+      transition: border-color 0.3s, color 0.3s;
+    }
+    .image-desc-input:hover { border-color: var(--border-hairline); }
+    .image-desc-input:focus { border-color: var(--neon); color: var(--white); }
+    .image-card .image-src {
+      font-size: 0.55rem; color: var(--titanium-dim);
+      word-break: break-all;
+    }
+
+    /* Upload area */
+    .upload-area {
+      border: 2px dashed var(--border-subtle); border-radius: 2px;
+      padding: 1.5rem; text-align: center; margin-bottom: 1rem;
+      transition: border-color 0.3s; cursor: pointer;
+    }
+    .upload-area:hover { border-color: var(--neon); }
+    .upload-area.dragover { border-color: var(--neon); background: var(--neon-ghost); }
+    .upload-text { font-size: 0.7rem; color: var(--titanium-dim); }
+    .upload-text .accent { color: var(--neon); }
+
+    /* Entry list */
+    .entry-list {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;
+    }
+    .entry-chip {
+      background: var(--carbon-card); border: 1px solid var(--border-subtle);
+      padding: 0.3rem 0.7rem; border-radius: 1px;
+      font-size: 0.65rem; font-weight: 700; cursor: pointer;
+      color: var(--white-dim); transition: all 0.3s;
+    }
+    .entry-chip:hover { border-color: var(--border-active); color: var(--white); }
+    .entry-chip.active { border-color: var(--neon); color: var(--neon); background: var(--neon-ghost); }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
+      background: var(--carbon-card); border: 1px solid var(--neon-dim);
+      color: var(--neon); padding: 0.6rem 1.2rem;
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em;
+      border-radius: 2px; opacity: 0; transform: translateY(10px);
+      transition: all 0.3s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.error { border-color: rgba(255,68,68,0.3); color: #ff4444; }
+
+    /* Password overlay */
+    .auth-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--carbon);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .auth-box {
+      text-align: center; max-width: 320px; width: 100%;
+    }
+    .auth-box h1 {
+      font-family: var(--font-display); font-size: 1.5rem; font-weight: 900;
+      margin-bottom: 0.5rem; letter-spacing: 0.1em;
+    }
+    .auth-box .sub { font-size: 0.65rem; color: var(--titanium-dim); margin-bottom: 2rem; }
+    .auth-box input {
+      text-align: center; margin-bottom: 1rem;
+      font-size: 0.85rem; padding: 0.6rem;
+    }
+    .auth-error { color: #ff4444; font-size: 0.65rem; margin-bottom: 1rem; min-height: 1.2em; }
+
+    /* Tab bar for images */
+    .tab-bar {
+      display: flex; gap: 0; margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+    .tab-item {
+      padding: 0.5rem 1rem; cursor: pointer;
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.15em;
+      color: var(--titanium-dim); text-transform: uppercase;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s;
+    }
+    .tab-item:hover { color: var(--white); }
+    .tab-item.active { color: var(--neon); border-bottom-color: var(--neon); }
+
+    /* Section visibility */
+    .module { display: none; }
+    .module.active { display: block; }
+
+    /* Loading */
+    .loading {
+      text-align: center; padding: 3rem;
+      font-size: 0.7rem; color: var(--titanium-dim);
+    }
+  </style>
+</head>
+<body>
+  <!-- Auth overlay -->
+  <div class="auth-overlay" id="authOverlay">
+    <div class="auth-box">
+      <h1>MOB<span style="color:var(--neon)">1S</span></h1>
+      <div class="sub">DEV PANEL AUTHENTICATION</div>
+      <input type="password" id="authInput" placeholder="PASSWORD" autocomplete="off">
+      <div class="auth-error" id="authError"></div>
+      <button class="btn btn-primary" onclick="doAuth()" style="width:100%">AUTHENTICATE</button>
+    </div>
+  </div>
+
+  <!-- Main app -->
+  <div id="app" style="display:none">
+    <div class="tel-bar">
+      <span class="brand">MOB<span class="accent">1S</span></span>
+      <span>DEV_PANEL</span>
+      <span class="status">ONLINE</span>
+      <span id="telTime">--:--:--</span>
+      <button class="logout-btn" onclick="logout()">LOGOUT</button>
+    </div>
+
+    <div class="app">
+      <nav class="sidebar">
+        <div class="nav-item active" data-module="traveled" onclick="switchModule('traveled')">足迹</div>
+        <div class="nav-item" data-module="profiles" onclick="switchModule('profiles')">城市档案</div>
+        <div class="nav-item" data-module="images" onclick="switchModule('images')">图片</div>
+        <div class="nav-item" data-module="hobbies" onclick="switchModule('hobbies')">爱好</div>
+        <div class="nav-item" data-module="people" onclick="switchModule('people')">人物</div>
+      </nav>
+
+      <main class="content">
+        <!-- Module: Traveled Cities -->
+        <div class="module active" id="mod-traveled">
+          <div class="section-header">
+            <span class="section-index">SECTOR 01</span>
+            <span class="section-title">TRAVELED_CITIES</span>
+          </div>
+          <div class="entry-list" id="traveledList"></div>
+          <div id="traveledForm"></div>
+          <button class="btn btn-primary" onclick="addTraveled()" style="margin-top:1rem">+ ADD CITY</button>
+        </div>
+
+        <!-- Module: City Profiles -->
+        <div class="module" id="mod-profiles">
+          <div class="section-header">
+            <span class="section-index">SECTOR 02</span>
+            <span class="section-title">CITY_PROFILES</span>
+          </div>
+          <div class="entry-list" id="profilesList"></div>
+          <div id="profilesForm"></div>
+        </div>
+
+        <!-- Module: Images -->
+        <div class="module" id="mod-images">
+          <div class="section-header">
+            <span class="section-index">SECTOR 03</span>
+            <span class="section-title">IMAGES</span>
+          </div>
+          <div class="tab-bar">
+            <div class="tab-item active" onclick="switchImageTab('city')">城市</div>
+            <div class="tab-item" onclick="switchImageTab('district')">区级</div>
+            <div class="tab-item" onclick="switchImageTab('hobby')">爱好</div>
+            <div class="tab-item" onclick="switchImageTab('person')">人物</div>
+          </div>
+          <div id="imageContent"></div>
+        </div>
+
+        <!-- Module: Hobbies -->
+        <div class="module" id="mod-hobbies">
+          <div class="section-header">
+            <span class="section-index">SECTOR 04</span>
+            <span class="section-title">HOBBY_PROFILES</span>
+          </div>
+          <div class="entry-list" id="hobbiesList"></div>
+          <div id="hobbiesForm"></div>
+        </div>
+
+        <!-- Module: People -->
+        <div class="module" id="mod-people">
+          <div class="section-header">
+            <span class="section-index">SECTOR 05</span>
+            <span class="section-title">PERSON_PROFILES</span>
+          </div>
+          <div class="entry-list" id="peopleList"></div>
+          <div id="peopleForm"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // --- State ---
+    let PASSWORD = '';
+    let provinces = [];
+    let currentModule = 'traveled';
+    let imageTab = 'city';
+
+    // Data caches
+    let traveledData = {};
+    let cityProfilesData = {};
+    let cityImagesData = {};
+    let districtImagesData = {};
+    let districtNotesData = {};
+    let wishlistData = {};
+    let hobbyProfilesData = {};
+    let personProfilesData = {};
+    let hobbyImagesData = {};
+    let personImagesData = {};
+    let hobbyMetaData = {};
+    let personMetaData = {};
+
+    // Selected keys
+    let selectedTraveled = null;
+    let selectedProfile = null;
+    let selectedHobby = null;
+    let selectedPerson = null;
+
+    // --- Auth ---
+    function doAuth() {
+      const pw = document.getElementById('authInput').value;
+      PASSWORD = pw;
+      apiFetch('/api/traveled-cities').then(data => {
+        if (data && !data.error) {
+          document.getElementById('authOverlay').style.display = 'none';
+          document.getElementById('app').style.display = 'block';
+          sessionStorage.setItem('devpanel_pw', pw);
+          init();
+        } else {
+          document.getElementById('authError').textContent = 'WRONG PASSWORD';
+        }
+      }).catch(() => {
+        document.getElementById('authError').textContent = 'CONNECTION FAILED';
+      });
+    }
+
+    function logout() {
+      sessionStorage.removeItem('devpanel_pw');
+      PASSWORD = '';
+      document.getElementById('app').style.display = 'none';
+      document.getElementById('authOverlay').style.display = 'flex';
+      document.getElementById('authInput').value = '';
+      document.getElementById('authError').textContent = '';
+    }
+
+    // Auto-login from session
+    (function() {
+      const saved = sessionStorage.getItem('devpanel_pw');
+      if (saved) {
+        PASSWORD = saved;
+        apiFetch('/api/traveled-cities').then(data => {
+          if (data && !data.error) {
+            document.getElementById('authOverlay').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            init();
+          }
+        }).catch(() => {});
+      }
+      document.getElementById('authInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter') doAuth();
+      });
+    })();
+
+    // --- API helpers ---
+    function apiFetch(url, opts = {}) {
+      const headers = { 'Authorization': 'Bearer ' + PASSWORD, ...opts.headers };
+      if (opts.body && typeof opts.body === 'object' && !opts.body._multipart) {
+        headers['Content-Type'] = 'application/json';
+        opts.body = JSON.stringify(opts.body);
+      }
+      return fetch(url, { ...opts, headers }).then(r => r.json());
+    }
+
+    // --- Init ---
+    async function init() {
+      const results = await Promise.all([
+        apiFetch('/api/provinces'),
+        apiFetch('/api/traveled-cities'),
+        apiFetch('/api/city-profiles'),
+        apiFetch('/api/city-images'),
+        apiFetch('/api/district-notes'),
+        apiFetch('/api/wishlist-impressions'),
+        apiFetch('/api/hobby-profiles'),
+        apiFetch('/api/person-profiles'),
+        apiFetch('/api/hobby-images'),
+        apiFetch('/api/person-images'),
+        apiFetch('/api/hobby-meta'),
+        apiFetch('/api/person-meta'),
+        apiFetch('/api/district-images'),
+      ]);
+      provinces = results[0] || [];
+      traveledData = results[1] || {};
+      cityProfilesData = results[2] || {};
+      cityImagesData = results[3] || {};
+      districtNotesData = results[4] || {};
+      wishlistData = results[5] || {};
+      hobbyProfilesData = results[6] || {};
+      personProfilesData = results[7] || {};
+      hobbyImagesData = results[8] || {};
+      personImagesData = results[9] || {};
+      hobbyMetaData = results[10] || {};
+      personMetaData = results[11] || {};
+      districtImagesData = results[12] || {};
+
+      renderTraveled();
+      renderProfiles();
+      renderImages();
+      renderHobbies();
+      renderPeople();
+      startClock();
+    }
+
+    // --- Clock ---
+    function startClock() {
+      const el = document.getElementById('telTime');
+      setInterval(() => {
+        const n = new Date();
+        el.textContent = n.toTimeString().slice(0, 8);
+      }, 1000);
+    }
+
+    // --- Module switching ---
+    function switchModule(name) {
+      currentModule = name;
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.module === name));
+      document.querySelectorAll('.module').forEach(m => m.classList.toggle('active', m.id === 'mod-' + name));
+    }
+
+    // --- Toast ---
+    function toast(msg, isError = false) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.className = 'toast show' + (isError ? ' error' : '');
+      setTimeout(() => el.className = 'toast', 2500);
+    }
+
+    // =============================================
+    // TRAVELED CITIES
+    // =============================================
+    function renderTraveled() {
+      const list = document.getElementById('traveledList');
+      list.innerHTML = Object.keys(traveledData).map(k =>
+        `<div class="entry-chip ${selectedTraveled===k?'active':''}" onclick="selectTraveled('${k}')">${traveledData[k].name}</div>`
+      ).join('');
+      if (selectedTraveled) renderTraveledForm();
+      else document.getElementById('traveledForm').innerHTML = '';
+    }
+
+    function selectTraveled(key) {
+      selectedTraveled = key;
+      renderTraveled();
+    }
+
+    function renderTraveledForm() {
+      const d = traveledData[selectedTraveled] || {};
+      document.getElementById('traveledForm').innerHTML = `
+        <div class="card">
+          <div class="card-header">
+            <span class="card-key">${selectedTraveled}</span>
+            <div class="card-actions">
+              <button class="btn btn-danger" onclick="deleteTraveled()">DELETE</button>
+              <button class="btn btn-primary" onclick="saveTraveled()">SAVE</button>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>城市</label>
+              <input id="tc_name" value="${esc(d.name||'')}" placeholder="城市名">
+            </div>
+            <div class="form-group">
+              <label>省份</label>
+              <input id="tc_province" value="${esc(d.province||'')}" placeholder="省份">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>天数</label>
+              <input id="tc_days" value="${esc(d.days||'')}" placeholder="可选">
+            </div>
+            <div class="form-group">
+              <label>年份</label>
+              <input id="tc_year" value="${esc(d.year||'')}" placeholder="可选">
+            </div>
+          </div>
+        </div>`;
+    }
+
+    async function saveTraveled() {
+      const data = {
+        name: gv('tc_name'),
+        province: gv('tc_province'),
+      };
+      if (gv('tc_days')) data.days = gv('tc_days');
+      if (gv('tc_year')) data.year = gv('tc_year');
+      await apiFetch('/api/traveled-cities/' + selectedTraveled, { method: 'PUT', body: data });
+      traveledData[selectedTraveled] = data;
+      toast('SAVED');
+    }
+
+    async function deleteTraveled() {
+      if (!confirm('Delete ' + selectedTraveled + '?')) return;
+      await apiFetch('/api/traveled-cities/' + selectedTraveled, { method: 'DELETE' });
+      delete traveledData[selectedTraveled];
+      selectedTraveled = null;
+      renderTraveled();
+      toast('DELETED');
+    }
+
+    function addTraveled() {
+      const adcode = prompt('Province adcode (e.g. 330000):');
+      const cityName = prompt('City name (e.g. 杭州):');
+      if (!adcode || !cityName) return;
+      const key = adcode + '_' + cityName;
+      const province = provinces.find(p => p.adcode == adcode);
+      const data = { name: cityName, province: province ? province.name : '' };
+      apiFetch('/api/traveled-cities', { method: 'POST', body: { key, data } }).then(r => {
+        if (r.error) { toast(r.error, true); return; }
+        traveledData[key] = data;
+        selectedTraveled = key;
+        renderTraveled();
+        toast('ADDED');
+      });
+    }
+
+    // =============================================
+    // CITY PROFILES
+    // =============================================
+    function renderProfiles() {
+      const list = document.getElementById('profilesList');
+      const cityKeys = Object.keys(cityProfilesData);
+      const districtKeys = Object.keys(districtNotesData);
+      const wishlistKeys = Object.keys(wishlistData);
+      // 足迹中没有档案的城市
+      const traveledOnlyKeys = Object.keys(traveledData).filter(k =>
+        !cityProfilesData[k] && !districtNotesData[k] && !wishlistData[k] && !k.includes('_') === false
+      );
+
+      let html = cityKeys.map(k =>
+        `<div class="entry-chip ${selectedProfile===k?'active':''}" onclick="selectProfile('${k}')">${cityProfilesData[k].name||k}</div>`
+      ).join('');
+      if (traveledOnlyKeys.length > 0) {
+        html += '<div style="width:100%;margin:0.5rem 0 0.3rem;font-size:0.55rem;color:var(--neon-dim);letter-spacing:0.15em">TRAVELED (无档案)</div>';
+        html += traveledOnlyKeys.map(k =>
+          `<div class="entry-chip ${selectedProfile===k?'active':''}" onclick="selectProfile('${k}')" style="border-style:dashed;opacity:0.6">${traveledData[k].name||k}</div>`
+        ).join('');
+      }
+      if (districtKeys.length > 0) {
+        html += '<div style="width:100%;margin:0.5rem 0 0.3rem;font-size:0.55rem;color:var(--titanium-dim);letter-spacing:0.15em">DISTRICTS</div>';
+        html += districtKeys.map(k =>
+          `<div class="entry-chip ${selectedProfile===k?'active':''}" onclick="selectProfile('${k}')" style="opacity:0.7">${districtNotesData[k].name||k}</div>`
+        ).join('');
+      }
+      if (wishlistKeys.length > 0) {
+        html += '<div style="width:100%;margin:0.5rem 0 0.3rem;font-size:0.55rem;color:var(--amber);letter-spacing:0.15em">WISHLIST</div>';
+        html += wishlistKeys.map(k =>
+          `<div class="entry-chip ${selectedProfile===k?'active':''}" onclick="selectProfile('${k}')" style="border-color:var(--amber-dim);color:var(--amber)">${wishlistData[k].name||k}</div>`
+        ).join('');
+      }
+      list.innerHTML = html;
+      if (selectedProfile) renderProfileForm();
+      else document.getElementById('profilesForm').innerHTML = '';
+    }
+
+    function selectProfile(key) {
+      selectedProfile = key;
+      renderProfiles();
+    }
+
+    function getProfileSource(key) {
+      if (key in cityProfilesData) return 'city-profiles';
+      if (key in districtNotesData) return 'district-notes';
+      if (key in wishlistData) return 'wishlist-impressions';
+      if (key in traveledData) return 'traveled-cities';
+      return 'city-profiles';
+    }
+
+    function renderProfileForm() {
+      const d = cityProfilesData[selectedProfile] || districtNotesData[selectedProfile] || wishlistData[selectedProfile] || (traveledData[selectedProfile] ? { name: traveledData[selectedProfile].name, tag: traveledData[selectedProfile].province, role: '', bio: [], stats: [], highlights: [] } : {});
+      const statsHtml = (d.stats || []).map((s, i) =>
+        `<div class="stat-row">
+          <input class="stat-v" value="${esc(s.v||'')}" placeholder="值" title="值">
+          <input class="stat-l" value="${esc(s.l||'')}" placeholder="标签" title="标签">
+          <button class="stat-remove" onclick="this.parentElement.remove()">&times;</button>
+        </div>`
+      ).join('');
+      const bioHtml = (d.bio || []).map((b, i) =>
+        `<div class="form-group" style="position:relative">
+          <textarea class="bio-item" rows="3" placeholder="输入段落...">${esc(b)}</textarea>
+          <button class="stat-remove" style="position:absolute;top:0;right:0" onclick="this.parentElement.remove()">&times;</button>
+        </div>`
+      ).join('');
+
+      document.getElementById('profilesForm').innerHTML = `
+        <div class="card">
+          <div class="card-header">
+            <span class="card-key">${selectedProfile}</span>
+            <div class="card-actions">
+              <button class="btn btn-primary" onclick="saveProfile()">SAVE</button>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>名称</label>
+              <input id="cp_name" value="${esc(d.name||'')}" placeholder="城市名">
+            </div>
+            <div class="form-group">
+              <label>Tag</label>
+              <input id="cp_tag" value="${esc(d.tag||'')}" placeholder="标签">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Role</label>
+            <input id="cp_role" value="${esc(d.role||'')}" placeholder="角色/定位">
+          </div>
+          <div class="form-group">
+            <label>Bio (每段一条)</label>
+            <div id="cp_bio_list">${bioHtml}</div>
+            <button class="btn" onclick="addBioRow()" style="margin-top:0.4rem">+ ADD</button>
+          </div>
+          <div class="form-group">
+            <label>Stats</label>
+            <div id="cp_stats_list">${statsHtml}</div>
+            <button class="btn" onclick="addStatRow('cp_stats_list')" style="margin-top:0.4rem">+ ADD</button>
+          </div>
+          <div class="form-group">
+            <label>Highlights (逗号分隔)</label>
+            <input id="cp_highlights" value="${esc((d.highlights||[]).join(', '))}" placeholder="亮点，逗号分隔">
+          </div>
+          <div class="form-group">
+            <label>Impression</label>
+            <textarea id="cp_impression" rows="4" placeholder="印象/感想...">${esc(d.impression||'')}</textarea>
+          </div>
+        </div>`;
+    }
+
+    async function saveProfile() {
+      const stats = [];
+      document.querySelectorAll('#cp_stats_list .stat-row').forEach(row => {
+        stats.push({ v: row.querySelector('.stat-v').value, l: row.querySelector('.stat-l').value });
+      });
+      const bio = Array.from(document.querySelectorAll('#cp_bio_list .bio-item')).map(t => t.value).filter(Boolean);
+      const data = {
+        name: gv('cp_name'),
+        tag: gv('cp_tag'),
+        role: gv('cp_role'),
+        bio,
+        stats,
+        highlights: gv('cp_highlights').split(',').map(s => s.trim()).filter(Boolean),
+        impression: gv('cp_impression'),
+      };
+
+      const source = getProfileSource(selectedProfile);
+      // 足迹城市转为完整档案
+      if (source === 'traveled-cities') {
+        await apiFetch('/api/city-profiles/' + selectedProfile, { method: 'PUT', body: data });
+        cityProfilesData[selectedProfile] = data;
+        toast('CONVERTED TO PROFILE');
+      } else {
+        await apiFetch('/api/' + source + '/' + selectedProfile, { method: 'PUT', body: data });
+        if (source === 'city-profiles') cityProfilesData[selectedProfile] = data;
+        else if (source === 'district-notes') districtNotesData[selectedProfile] = data;
+        else if (source === 'wishlist-impressions') wishlistData[selectedProfile] = data;
+        toast('SAVED');
+      }
+      renderProfiles();
+    }
+
+    function addBioRow() {
+      const div = document.createElement('div');
+      div.className = 'form-group';
+      div.style.position = 'relative';
+      div.innerHTML = `<textarea class="bio-item" rows="3" placeholder="新段落..." title="段落"></textarea>
+        <button class="stat-remove" style="position:absolute;top:0;right:0" onclick="this.parentElement.remove()">&times;</button>`;
+      document.getElementById('cp_bio_list').appendChild(div);
+    }
+
+    function addStatRow(containerId) {
+      const div = document.createElement('div');
+      div.className = 'stat-row';
+      div.innerHTML = `<input class="stat-v" placeholder="值" title="值"><input class="stat-l" placeholder="标签" title="标签"><button class="stat-remove" onclick="this.parentElement.remove()">&times;</button>`;
+      document.getElementById(containerId).appendChild(div);
+    }
+
+    // =============================================
+    // IMAGES
+    // =============================================
+    function switchImageTab(tab) {
+      imageTab = tab;
+      document.querySelectorAll('.tab-item').forEach(t => t.classList.toggle('active', t.textContent.includes({city:'城市',district:'区级',hobby:'爱好',person:'人物'}[tab])));
+      renderImages();
+    }
+
+    function renderImages() {
+      const container = document.getElementById('imageContent');
+      const dataMap = { city: cityImagesData, district: districtImagesData, hobby: hobbyImagesData, person: personImagesData };
+      const data = dataMap[imageTab];
+      const keys = Object.keys(data);
+
+      container.innerHTML = `
+        <div class="entry-list">
+          ${keys.map(k => `<div class="entry-chip" onclick="selectImageContext('${k}')">${k}</div>`).join('')}
+        </div>
+        <div id="imageContextArea"></div>`;
+    }
+
+    let currentImageKey = null;
+    let currentUploadDir = null;
+
+    function selectImageContext(key) {
+      const dataMap = { city: cityImagesData, district: districtImagesData, hobby: hobbyImagesData, person: personImagesData };
+      const data = dataMap[imageTab][key] || [];
+      const area = document.getElementById('imageContextArea');
+
+      const dirMap = { city: key.split('_')[1] || key, district: key.split('_')[1] || key, hobby: key.replace('hobby-', ''), person: key };
+      const uploadDir = imageTab === 'city' ? dirMap.city : (imageTab === 'district' ? 'districts/' + dirMap.district : (imageTab === 'hobby' ? 'hobbies/' + dirMap.hobby : 'people/' + dirMap.person));
+
+      currentImageKey = key;
+      currentUploadDir = uploadDir;
+
+      area.innerHTML = `
+        <div class="card" id="dropZone" style="transition: border-color 0.3s, background 0.3s">
+          <div class="card-header">
+            <span class="card-key">${key}</span>
+            <div class="card-actions">
+              <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">UPLOAD</button>
+            </div>
+          </div>
+          <div class="drop-hint" style="text-align:center;color:var(--titanium-dim);font-size:0.6rem;padding:0.4rem;letter-spacing:0.1em">
+            拖拽图片到此处上传 / 或点击按钮选择
+          </div>
+          <input type="file" id="fileInput" style="display:none" accept="image/*" multiple title="选择图片文件" onchange="handleFileSelect(this)">
+          <div class="image-grid" id="imageGrid">
+            ${data.map((img, i) => `
+              <div class="image-card" data-idx="${i}" draggable="true">
+                <img src="../${img.src}" alt="${esc(img.desc)}" onerror="this.style.display='none'">
+                <div class="image-info">
+                  <input class="image-desc-input" value="${esc(img.desc)}" placeholder="图片描述" title="图片描述" onchange="updateImageDesc(${i}, this.value)">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.3rem">
+                    <span class="image-src">${esc(img.src.split('/').pop())}</span>
+                    <div style="display:flex;gap:0.3rem">
+                      ${i > 0 ? `<button class="btn" onclick="moveImage(${i},-1)" title="上移">&uarr;</button>` : ''}
+                      ${i < data.length - 1 ? `<button class="btn" onclick="moveImage(${i},1)" title="下移">&darr;</button>` : ''}
+                      <button class="btn btn-danger" onclick="deleteImage(${i})" title="删除">&times;</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+            ${data.length === 0 ? '<div style="grid-column:1/-1;text-align:center;color:var(--titanium-dim);font-size:0.7rem;padding:2rem">NO IMAGES</div>' : ''}
+          </div>
+        </div>`;
+
+      // Setup drag-and-drop for file upload
+      const dropZone = document.getElementById('dropZone');
+      dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor = 'var(--neon)'; dropZone.style.background = 'var(--neon-ghost)'; });
+      dropZone.addEventListener('dragleave', e => { e.preventDefault(); dropZone.style.borderColor = ''; dropZone.style.background = ''; });
+      dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.style.borderColor = '';
+        dropZone.style.background = '';
+        const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+        if (files.length > 0) uploadFiles(files, currentImageKey, currentUploadDir);
+      });
+
+      // Setup drag-to-reorder on image cards
+      let dragIdx = null;
+      document.querySelectorAll('#imageGrid .image-card[draggable]').forEach(card => {
+        card.addEventListener('dragstart', e => {
+          dragIdx = parseInt(card.dataset.idx);
+          e.dataTransfer.effectAllowed = 'move';
+          card.style.opacity = '0.4';
+        });
+        card.addEventListener('dragend', e => {
+          card.style.opacity = '';
+        });
+        card.addEventListener('dragover', e => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          card.style.borderColor = 'var(--neon)';
+        });
+        card.addEventListener('dragleave', e => {
+          card.style.borderColor = '';
+        });
+        card.addEventListener('drop', async e => {
+          e.preventDefault();
+          e.stopPropagation();
+          card.style.borderColor = '';
+          const targetIdx = parseInt(card.dataset.idx);
+          if (dragIdx !== null && dragIdx !== targetIdx) {
+            const data = getImageData();
+            const [item] = data.splice(dragIdx, 1);
+            data.splice(targetIdx, 0, item);
+            await saveImageData();
+            selectImageContext(currentImageKey);
+            toast('REORDERED');
+          }
+          dragIdx = null;
+        });
+      });
+    }
+
+    function handleFileSelect(input) {
+      const files = Array.from(input.files);
+      if (files.length > 0) uploadFiles(files, currentImageKey, currentUploadDir);
+      input.value = '';
+    }
+
+    async function uploadFiles(files, key, dir) {
+      for (const file of files) {
+        await uploadSingleFile(file, key, dir);
+      }
+      selectImageContext(key);
+      toast(files.length + ' UPLOADED');
+    }
+
+    async function uploadSingleFile(file, key, dir) {
+      const form = new FormData();
+      form.append('file', file);
+      form.append('dir', dir);
+
+      const res = await fetch('/api/upload-image', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + PASSWORD },
+        body: form,
+      });
+      const result = await res.json();
+      if (result.error) throw new Error(result.error);
+
+      const newImg = { src: result.path, desc: file.name.replace(/\.[^.]+$/, '') };
+
+      const dataMap = { city: cityImagesData, district: districtImagesData, hobby: hobbyImagesData, person: personImagesData };
+      const apiMap = { city: 'city-images', district: 'district-images', hobby: 'hobby-images', person: 'person-images' };
+      if (!dataMap[imageTab][key]) dataMap[imageTab][key] = [];
+      dataMap[imageTab][key].push(newImg);
+
+      await apiFetch('/api/' + apiMap[imageTab] + '/' + key, {
+        method: 'PUT',
+        body: dataMap[imageTab][key],
+      });
+    }
+
+    function getImageData() {
+      const dataMap = { city: cityImagesData, district: districtImagesData, hobby: hobbyImagesData, person: personImagesData };
+      return dataMap[imageTab][currentImageKey] || [];
+    }
+
+    function getApiName() {
+      return { city: 'city-images', district: 'district-images', hobby: 'hobby-images', person: 'person-images' }[imageTab];
+    }
+
+    async function saveImageData() {
+      const data = getImageData();
+      await apiFetch('/api/' + getApiName() + '/' + currentImageKey, {
+        method: 'PUT',
+        body: data,
+      });
+    }
+
+    async function updateImageDesc(idx, value) {
+      const data = getImageData();
+      if (data[idx]) {
+        data[idx].desc = value;
+        await saveImageData();
+        toast('DESC UPDATED');
+      }
+    }
+
+    async function moveImage(idx, dir) {
+      const data = getImageData();
+      const newIdx = idx + dir;
+      if (newIdx < 0 || newIdx >= data.length) return;
+      [data[idx], data[newIdx]] = [data[newIdx], data[idx]];
+      await saveImageData();
+      selectImageContext(currentImageKey);
+      toast('MOVED');
+    }
+
+    async function deleteImage(idx) {
+      const data = getImageData();
+      if (!confirm('删除 ' + (data[idx].desc || data[idx].src.split('/').pop()) + '？')) return;
+      data.splice(idx, 1);
+      await saveImageData();
+      selectImageContext(currentImageKey);
+      toast('DELETED');
+    }
+
+    // =============================================
+    // HOBBIES
+    // =============================================
+    function renderHobbies() {
+      const list = document.getElementById('hobbiesList');
+      const keys = Object.keys(hobbyProfilesData);
+      list.innerHTML = keys.map(k =>
+        `<div class="entry-chip ${selectedHobby===k?'active':''}" onclick="selectHobby('${k}')">${hobbyProfilesData[k].name||k}</div>`
+      ).join('');
+      if (selectedHobby) renderHobbyForm();
+      else document.getElementById('hobbiesForm').innerHTML = '';
+    }
+
+    function selectHobby(key) {
+      selectedHobby = key;
+      renderHobbies();
+    }
+
+    function renderHobbyForm() {
+      const d = hobbyProfilesData[selectedHobby] || {};
+      const meta = hobbyMetaData[selectedHobby] || {};
+      const bioHtml = (d.bio || []).map((s, i) =>
+        `<div class="form-group" style="position:relative">
+          <textarea class="bio-item" rows="4" placeholder="输入段落...">${esc(s)}</textarea>
+          <button class="stat-remove" style="position:absolute;top:0;right:0" onclick="this.parentElement.remove()">&times;</button>
+        </div>`
+      ).join('');
+      const statsHtml = (d.stats || []).map((s, i) =>
+        `<div class="stat-row">
+          <input class="stat-v" value="${esc(s.v||'')}" placeholder="值" title="值">
+          <input class="stat-l" value="${esc(s.l||'')}" placeholder="标签" title="标签">
+          <button class="stat-remove" onclick="this.parentElement.remove()">&times;</button>
+        </div>`
+      ).join('');
+      const achHtml = (d.achievements || []).map((a, i) =>
+        `<div class="form-group" style="position:relative">
+          <input class="ach-item" value="${esc(a)}" placeholder="成就..." title="成就">
+          <button class="stat-remove" style="position:absolute;top:0;right:0" onclick="this.parentElement.remove()">&times;</button>
+        </div>`
+      ).join('');
+
+      document.getElementById('hobbiesForm').innerHTML = `
+        <div class="card">
+          <div class="card-header">
+            <span class="card-key">${selectedHobby}</span>
+            <div class="card-actions">
+              <button class="btn btn-primary" onclick="saveHobby()">SAVE</button>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>名称</label>
+              <input id="hp_name" value="${esc(d.name||'')}" placeholder="爱好名" title="名称">
+            </div>
+            <div class="form-group">
+              <label>Tag</label>
+              <input id="hp_tag" value="${esc(d.tag||'')}" placeholder="标签" title="Tag">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Role</label>
+            <input id="hp_role" value="${esc(d.role||'')}" placeholder="角色/定位" title="Role">
+          </div>
+          <div class="form-group">
+            <label>My Story (每段一条)</label>
+            <div id="hp_bio_list">${bioHtml}</div>
+            <button class="btn" onclick="addHobbyBioRow()" style="margin-top:0.4rem">+ ADD</button>
+          </div>
+          <div class="form-group">
+            <label>Stats</label>
+            <div id="hp_stats_list">${statsHtml}</div>
+            <button class="btn" onclick="addStatRow('hp_stats_list')" style="margin-top:0.4rem">+ ADD</button>
+          </div>
+          <div class="form-group">
+            <label>Achievements</label>
+            <div id="hp_ach_list">${achHtml}</div>
+            <button class="btn" onclick="addHobbyAchRow()" style="margin-top:0.4rem">+ ADD</button>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Meta Name</label>
+              <input id="hp_meta_name" value="${esc(meta.name||'')}" placeholder="显示名" title="Meta Name">
+            </div>
+            <div class="form-group">
+              <label>Meta Tag</label>
+              <input id="hp_meta_tag" value="${esc(meta.tag||'')}" placeholder="标签" title="Meta Tag">
+            </div>
+          </div>
+        </div>`;
+    }
+
+    async function saveHobby() {
+      const bio = Array.from(document.querySelectorAll('#hp_bio_list .bio-item')).map(t => t.value).filter(Boolean);
+      const stats = [];
+      document.querySelectorAll('#hp_stats_list .stat-row').forEach(row => {
+        stats.push({ v: row.querySelector('.stat-v').value, l: row.querySelector('.stat-l').value });
+      });
+      const achievements = Array.from(document.querySelectorAll('#hp_ach_list .ach-item')).map(t => t.value).filter(Boolean);
+      const data = {
+        name: gv('hp_name'),
+        tag: gv('hp_tag'),
+        role: gv('hp_role'),
+        bio,
+        stats,
+        achievements,
+      };
+      await apiFetch('/api/hobby-profiles/' + selectedHobby, { method: 'PUT', body: data });
+      hobbyProfilesData[selectedHobby] = data;
+
+      // Save meta
+      const meta = {
+        name: gv('hp_meta_name'),
+        tag: gv('hp_meta_tag'),
+        backUrl: 'index.html#hobbies',
+      };
+      await apiFetch('/api/hobby-meta/' + selectedHobby, { method: 'PUT', body: meta });
+      hobbyMetaData[selectedHobby] = meta;
+
+      toast('SAVED');
+    }
+
+    function addHobbyBioRow() {
+      const div = document.createElement('div');
+      div.className = 'form-group';
+      div.style.position = 'relative';
+      div.innerHTML = `<textarea class="bio-item" rows="4" placeholder="新段落..." title="段落"></textarea>
+        <button class="stat-remove" style="position:absolute;top:0;right:0" onclick="this.parentElement.remove()">&times;</button>`;
+      document.getElementById('hp_bio_list').appendChild(div);
+    }
+
+    function addHobbyAchRow() {
+      const div = document.createElement('div');
+      div.className = 'form-group';
+      div.style.position = 'relative';
+      div.innerHTML = `<input class="ach-item" placeholder="新成就..." title="成就">
+        <button class="stat-remove" style="position:absolute;top:0;right:0" onclick="this.parentElement.remove()">&times;</button>`;
+      document.getElementById('hp_ach_list').appendChild(div);
+    }
+
+    // =============================================
+    // PEOPLE
+    // =============================================
+    function renderPeople() {
+      const list = document.getElementById('peopleList');
+      const keys = Object.keys(personProfilesData);
+      list.innerHTML = keys.map(k =>
+        `<div class="entry-chip ${selectedPerson===k?'active':''}" onclick="selectPerson('${k}')">${personProfilesData[k].name||k}</div>`
+      ).join('');
+      if (selectedPerson) renderPersonForm();
+      else document.getElementById('peopleForm').innerHTML = '';
+    }
+
+    function selectPerson(key) {
+      selectedPerson = key;
+      renderPeople();
+    }
+
+    function renderPersonForm() {
+      const d = personProfilesData[selectedPerson] || {};
+      const meta = personMetaData[selectedPerson] || {};
+      const statsHtml = (d.stats || []).map((s, i) =>
+        `<div class="stat-row">
+          <input class="stat-v" value="${esc(s.v||'')}" placeholder="值" title="值">
+          <input class="stat-l" value="${esc(s.l||'')}" placeholder="标签" title="标签">
+          <button class="stat-remove" onclick="this.parentElement.remove()">&times;</button>
+        </div>`
+      ).join('');
+      const bioHtml = (d.bio || []).map((b, i) =>
+        `<div class="form-group" style="position:relative">
+          <textarea class="bio-item" rows="3" placeholder="输入段落...">${esc(b)}</textarea>
+          <button class="stat-remove" style="position:absolute;top:0;right:0" onclick="this.parentElement.remove()">&times;</button>
+        </div>`
+      ).join('');
+      const achHtml = (d.achievements || []).map((a, i) =>
+        `<div class="form-group" style="position:relative">
+          <input class="ach-item" value="${esc(a)}" placeholder="成就...">
+          <button class="stat-remove" style="position:absolute;top:0;right:0" onclick="this.parentElement.remove()">&times;</button>
+        </div>`
+      ).join('');
+
+      document.getElementById('peopleForm').innerHTML = `
+        <div class="card">
+          <div class="card-header">
+            <span class="card-key">${selectedPerson}</span>
+            <div class="card-actions">
+              <button class="btn btn-primary" onclick="savePerson()">SAVE</button>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>名称</label>
+              <input id="pp_name" value="${esc(d.name||'')}" placeholder="人物名">
+            </div>
+            <div class="form-group">
+              <label>Tag</label>
+              <input id="pp_tag" value="${esc(d.tag||'')}" placeholder="标签">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Role</label>
+            <input id="pp_role" value="${esc(d.role||'')}" placeholder="角色/定位">
+          </div>
+          <div class="form-group">
+            <label>Bio (每段一条)</label>
+            <div id="pp_bio_list">${bioHtml}</div>
+            <button class="btn" onclick="addPersonBioRow()" style="margin-top:0.4rem">+ ADD</button>
+          </div>
+          <div class="form-group">
+            <label>Stats</label>
+            <div id="pp_stats_list">${statsHtml}</div>
+            <button class="btn" onclick="addStatRow('pp_stats_list')" style="margin-top:0.4rem">+ ADD</button>
+          </div>
+          <div class="form-group">
+            <label>Achievements</label>
+            <div id="pp_ach_list">${achHtml}</div>
+            <button class="btn" onclick="addAchRow()" style="margin-top:0.4rem">+ ADD</button>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Meta Name</label>
+              <input id="pp_meta_name" value="${esc(meta.name||'')}" placeholder="显示名">
+            </div>
+            <div class="form-group">
+              <label>Meta Tag</label>
+              <input id="pp_meta_tag" value="${esc(meta.tag||'')}" placeholder="标签">
+            </div>
+          </div>
+        </div>`;
+    }
+
+    async function savePerson() {
+      const stats = [];
+      document.querySelectorAll('#pp_stats_list .stat-row').forEach(row => {
+        stats.push({ v: row.querySelector('.stat-v').value, l: row.querySelector('.stat-l').value });
+      });
+      const bio = Array.from(document.querySelectorAll('#pp_bio_list .bio-item')).map(t => t.value).filter(Boolean);
+      const achievements = Array.from(document.querySelectorAll('#pp_ach_list .ach-item')).map(t => t.value).filter(Boolean);
+      const data = {
+        name: gv('pp_name'),
+        tag: gv('pp_tag'),
+        role: gv('pp_role'),
+        bio,
+        stats,
+        achievements,
+      };
+      await apiFetch('/api/person-profiles/' + selectedPerson, { method: 'PUT', body: data });
+      personProfilesData[selectedPerson] = data;
+
+      const meta = {
+        name: gv('pp_meta_name'),
+        tag: gv('pp_meta_tag'),
+        backUrl: 'detail.html?id=' + selectedPerson,
+      };
+      await apiFetch('/api/person-meta/' + selectedPerson, { method: 'PUT', body: meta });
+      personMetaData[selectedPerson] = meta;
+
+      toast('SAVED');
+    }
+
+    function addPersonBioRow() {
+      const div = document.createElement('div');
+      div.className = 'form-group';
+      div.style.position = 'relative';
+      div.innerHTML = `<textarea class="bio-item" rows="3" placeholder="新段落..." title="段落"></textarea>
+        <button class="stat-remove" style="position:absolute;top:0;right:0" onclick="this.parentElement.remove()">&times;</button>`;
+      document.getElementById('pp_bio_list').appendChild(div);
+    }
+
+    function addAchRow() {
+      const div = document.createElement('div');
+      div.className = 'form-group';
+      div.style.position = 'relative';
+      div.innerHTML = `<input class="ach-item" placeholder="新成就..." title="成就">
+        <button class="stat-remove" style="position:absolute;top:0;right:0" onclick="this.parentElement.remove()">&times;</button>`;
+      document.getElementById('pp_ach_list').appendChild(div);
+    }
+
+    // --- Utilities ---
+    function gv(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+    function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  </script>
+</body>
+</html>

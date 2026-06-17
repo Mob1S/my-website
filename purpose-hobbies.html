@@ -52,6 +52,57 @@
     .back-link:hover {
       gap: 0.8rem;
     }
+
+    /* --- Gallery Entry --- */
+    .gallery-entry {
+      margin-top: 2.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(191, 255, 0, 0.25);
+    }
+    .gallery-entry h2 {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      color: var(--neon);
+      margin-bottom: 1rem;
+    }
+    .gallery-thumbs {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+    }
+    .thumb-item {
+      width: 80px;
+      height: 80px;
+      overflow: hidden;
+      border: 1px solid rgba(191, 255, 0, 0.25);
+      border-radius: 2px;
+      transition: transform 0.2s ease;
+    }
+    .thumb-item:hover {
+      transform: scale(1.05);
+    }
+    .thumb-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .gallery-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--neon);
+      text-decoration: none;
+      transition: gap 0.3s;
+    }
+    .gallery-link:hover {
+      gap: 0.6rem;
+    }
   </style>
 </head>
 <body>
@@ -71,8 +122,43 @@
         <p>记录一下我现在喜欢的东西，不然以后忘了，我的记性太差。</p>
         <p>——</p>
       </div>
+      <div id="hobbyGalleries"></div>
+
       <a href="index.html#hobbies" class="back-link">&larr; BACK TO INDEX</a>
     </article>
   </main>
+
+  <script type="module">
+    import { HOBBY_IMAGES, HOBBY_META } from './gallery-data.js';
+
+    const container = document.getElementById('hobbyGalleries');
+
+    const hobbyIds = ['hobby-f1', 'hobby-basketball', 'hobby-cs', 'hobby-fitness'];
+    let html = '';
+
+    for (const id of hobbyIds) {
+      const images = HOBBY_IMAGES[id] || [];
+      const meta = HOBBY_META[id];
+      if (!meta) continue;
+
+      const hasImages = images.length > 0;
+
+      html += `
+        <div class="gallery-entry" ${hasImages ? '' : 'style="display:none"'}>
+          <h2>// ${meta.name}</h2>
+          <div class="gallery-thumbs">
+            ${images.slice(0, 3).map(img => `
+              <div class="thumb-item">
+                <img src="${img.src}" alt="${img.desc}" loading="lazy">
+              </div>
+            `).join('')}
+          </div>
+          <a href="gallery.html?src=hobbies&id=${id}" class="gallery-link">查看全部 →</a>
+        </div>
+      `;
+    }
+
+    container.innerHTML = html;
+  </script>
 </body>
 </html>

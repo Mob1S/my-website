@@ -26,9 +26,10 @@
 
 ```
 index.html          — 首页 (Hero + F1 主题)
-detail.html         — 详情页
+detail.html         — 人物详情页
 map-detail.html     — 地图详情页
 city-detail.html    — 城市详情页
+gallery.html        — 画廊浏览页
 purpose-about.html  — 关于页面
 purpose-ai.html     — AI 页面
 purpose-hobbies.html — 爱好页面
@@ -36,9 +37,20 @@ purpose-map.html    — 地图页面
 f1_preview.html     — F1 预览页
 ```
 
-## 数据文件
+## 数据与管理
 
 ```
+admin/
+├── admin.html              — 管理后台（可视化编辑）
+├── server.js               — Node.js 服务端
+└── data/                   — JSON 数据存储
+    ├── traveled-cities.json  — 已到访城市
+    ├── city-images.json      — 城市画廊图片
+    ├── person-images.json    — 人物画廊图片
+    ├── hobby-images.json     — 爱好画廊图片
+    ├── hobby-meta.json       — 爱好元数据
+    └── person-meta.json      — 人物元数据
+
 data/
 ├── 110000_full.json  (北京)
 ├── 120000_full.json  (天津)
@@ -53,7 +65,8 @@ data/
 |------|------|
 | `script.js` | 主脚本 — 交互逻辑、动画、粒子系统 |
 | `style.css` | 样式表 — Carbon Telemetry 设计系统 |
-| `map-data.js` | 地图数据 |
+| `map-data.js` | 地图数据（异步加载） |
+| `gallery-data.js` | 画廊数据模块 |
 | `F1_SVG_wb.svg` | F1 赛车 SVG 图标 |
 
 ## 设计系统

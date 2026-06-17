@@ -1,0 +1,63 @@
+{
+  "verstappen": [],
+  "leclerc": [],
+  "durant": [],
+  "klay": [],
+  "niko": [
+    {
+      "src": "images/people/niko/科隆巨人.png",
+      "desc": "科隆巨人"
+    },
+    {
+      "src": "images/people/niko/海边之虾.jpg",
+      "desc": "海边之虾"
+    },
+    {
+      "src": "images/people/niko/伏黑之虾.jpg",
+      "desc": "伏黑之虾"
+    },
+    {
+      "src": "images/people/niko/尼尼孩孩.jpg",
+      "desc": "尼尼孩孩"
+    },
+    {
+      "src": "images/people/niko/虾之同意.jpg",
+      "desc": "虾之同意"
+    },
+    {
+      "src": "images/people/niko/大虾高举双钳.jpg",
+      "desc": "大虾高举双钳"
+    },
+    {
+      "src": "images/people/niko/suchapity.jpg",
+      "desc": "such a pity"
+    },
+    {
+      "src": "images/people/niko/nikokillstable.jpg",
+      "desc": "niko kills table"
+    },
+    {
+      "src": "images/people/niko/尼想下班.jpg",
+      "desc": "尼想下班"
+    },
+    {
+      "src": "images/people/niko/G2尼.jpg",
+      "desc": "G2尼"
+    },
+    {
+      "src": "images/people/niko/虾之承诺.jpg",
+      "desc": "虾之承诺"
+    },
+    {
+      "src": "images/people/niko/cs杀之尼.jpg",
+      "desc": "cs杀之尼"
+    },
+    {
+      "src": "images/people/niko/奶尼.jpg",
+      "desc": "奶尼"
+    }
+  ],
+  "m0nesy": [],
+  "kaishengwang": [],
+  "tanchengyi": []
+}

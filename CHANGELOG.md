@@ -1,5 +1,31 @@
 # 更新日志
 
+## v1.7.0 — 2026-06-17 — 画廊系统 & 数据外部化
+
+### 新增
+- **图片画廊系统** — 城市、人物、爱好页面均支持缩略图画廊展示
+  - `gallery-data.js` 统一管理画廊数据加载（城市/人物/爱好/区级图片）
+  - `gallery.html` 画廊浏览页面
+  - 画廊入口组件（缩略图 + "查看全部"链接）
+- **管理后台** `admin/` — 数据管理面板
+  - `admin.html` 可视化管理城市故事、人物资料、画廊图片
+  - `admin/data/` JSON 数据存储（traveled-cities、city-images、person-images、hobby-images 等）
+- **区级经历样式** — 城市详情页区级经历卡片使用绿色高亮
+
+### 变更
+- **数据外部化** — 城市故事、人物资料、画廊数据迁移到 `admin/data/*.json`，页面通过 `fetch()` 异步加载
+  - `map-data.js` — `TRAVELED_CITIES` 改为异步加载 `traveled-cities.json`
+  - `detail.html` — 人物数据从硬编码改为 JSON 加载
+  - `city-detail.html` — 城市故事从 `CITY_PROFILES` 改为 JSON 加载
+- **页面精简** — 移除 detail.html / city-detail.html 中的硬编码数据，体积大幅缩减
+
+### 移除
+- `detail.html` 中的 `PROFILES` 硬编码数据（迁移至 JSON）
+- `city-detail.html` 中的 `CITY_PROFILES` 硬编码数据（迁移至 JSON）
+- `map-data.js` 中的 `TRAVELED_CITIES` 静态定义（改为动态加载）
+
+---
+
 ## v1.6.0 — 2026-06-09 — F1 赛车遮罩
 
 ### 新增

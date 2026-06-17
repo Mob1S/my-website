@@ -1,0 +1,10 @@
+{
+  "verstappen": { "name": "Max Verstappen", "tag": "Formula 1 · Red Bull", "backUrl": "detail.html?id=verstappen" },
+  "leclerc": { "name": "Charles Leclerc", "tag": "Formula 1 · Ferrari", "backUrl": "detail.html?id=leclerc" },
+  "durant": { "name": "Kevin Durant", "tag": "NBA · Suns", "backUrl": "detail.html?id=durant" },
+  "klay": { "name": "Klay Thompson", "tag": "NBA · Mavericks", "backUrl": "detail.html?id=klay" },
+  "niko": { "name": "NiKo", "tag": "CS · Falcons", "backUrl": "detail.html?id=niko" },
+  "m0nesy": { "name": "m0NESY", "tag": "CS · Falcons", "backUrl": "detail.html?id=m0nesy" },
+  "kaishengwang": { "name": "凯圣王", "tag": "Fitness", "backUrl": "detail.html?id=kaishengwang" },
+  "tanchengyi": { "name": "谭成义", "tag": "Fitness", "backUrl": "detail.html?id=tanchengyi" }
+}

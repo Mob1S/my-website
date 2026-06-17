@@ -14,26 +14,17 @@ export const INSET_VIEWBOX = { x: 680, y: 620, w: 200, h: 210 };
 
 // Cities with travel profiles — each entry links to city-detail.html?id={key}
 // Add entries here as you write about cities you've been to
-export const TRAVELED_CITIES = {
-  '610000_baoji': { name: '宝鸡', province: '陕西省' },
-  '610000_xianyang': { name: '咸阳', province: '陕西省' },
-  '610000_xian': { name: '西安', province: '陕西省' },
-  '110000_beijing': { name: '北京', province: '北京市', aggregate: true, days: '7', year: '2023' },
-  '110000_haidian': { name: '海淀', province: '北京市' },
-  '110000_dongcheng': { name: '东城', province: '北京市' },
-  '110000_xicheng': { name: '西城', province: '北京市' },
-  '110000_shijingshan': { name: '石景山', province: '北京市' },
-  '110000_yanqing': { name: '延庆', province: '北京市' },
-  '310000_shanghai': { name: '上海', province: '上海市', aggregate: true, days: '5', year: '2024' },
-  '310000_minhang': { name: '闵行', province: '上海市' },
-  '310000_huangpu': { name: '黄浦', province: '上海市' },
-  '310000_xuhui': { name: '徐汇', province: '上海市' },
-  '310000_hongqiao': { name: '虹桥', province: '上海市' },
-  '310000_pudongxinqu': { name: '浦东新区', province: '上海市' },
-  '310000_songjiang': { name: '松江', province: '上海市' },
-  '320000_suzhou': { name: '苏州', province: '江苏省' },
-  '320000_nanjing': { name: '南京', province: '江苏省' },
-  '330000_jiaxing': { name: '嘉兴', province: '浙江省' },
-  '330000_hangzhou': { name: '杭州', province: '浙江省' },
-  '370000_qingdao': { name: '青岛', province: '山东省' },
-};
+
+// Traveled cities loaded from admin/data/traveled-cities.json
+export let TRAVELED_CITIES = {};
+
+export async function loadTraveledCities() {
+  try {
+    const res = await fetch("admin/data/traveled-cities.json");
+    TRAVELED_CITIES = await res.json();
+  } catch (e) {
+    console.warn("Failed to load traveled-cities.json, using empty data");
+    TRAVELED_CITIES = {};
+  }
+  return TRAVELED_CITIES;
+}

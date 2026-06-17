@@ -248,7 +248,8 @@
   </footer>
 
   <script type="module">
-    import { CHINA_PROVINCES, TRAVELED_CITIES } from './map-data.js';
+    import { CHINA_PROVINCES, loadTraveledCities } from './map-data.js';
+    const TRAVELED_CITIES = await loadTraveledCities();
 
     const params = new URLSearchParams(window.location.search);
     const adcode = params.get('id');

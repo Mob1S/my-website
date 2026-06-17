@@ -106,6 +106,43 @@
       min-height: 6rem;
       font-style: italic;
     }
+    /* 区级经历 — 绿色 */
+    .experience-section h2 {
+      color: var(--neon);
+      border-bottom-color: var(--border-active);
+    }
+    .experience-card {
+      background: var(--neon-ghost);
+      border-color: var(--border-active);
+    }
+
+    /* --- Gallery Entry --- */
+    .gallery-entry {
+      margin-top: 2.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-active);
+    }
+    .gallery-entry h2 {
+      font-family: var(--font-mono); font-size: 0.6rem; font-weight: 700;
+      letter-spacing: 0.25em; color: var(--neon); margin-bottom: 1rem;
+    }
+    .gallery-thumbs {
+      display: flex; gap: 0.8rem; margin-bottom: 1rem;
+    }
+    .thumb-item {
+      width: 80px; height: 80px; overflow: hidden;
+      border: 1px solid var(--border-active); border-radius: 2px;
+      transition: transform 0.2s ease;
+    }
+    .thumb-item:hover { transform: scale(1.05); }
+    .thumb-item img { width: 100%; height: 100%; object-fit: cover; }
+    .gallery-link {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      font-family: var(--font-mono); font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 0.1em; color: var(--neon); text-decoration: none;
+      transition: gap 0.3s;
+    }
+    .gallery-link:hover { gap: 0.6rem; }
 
     .detail-footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border-hairline); margin-top: 2rem; }
     .footer-brand { font-family: var(--font-display); font-size: 0.7rem; font-weight: 800; color: var(--white); letter-spacing: 0.05em; }
@@ -144,440 +181,19 @@
   </footer>
 
   <script type="module">
-    import { TRAVELED_CITIES } from './map-data.js';
+    import { loadTraveledCities } from './map-data.js';
 
-    // =============================================
-    // City Profiles — 你写的城市故事
-    // 每个去过的地方，都值得一段记录
-    // =============================================
-    const CITY_PROFILES = {
-      
-      
-      // ==========================================
-      // 添加更多城市示例（取消注释并填写你的故事）
-      // ==========================================
 
-      // ==========================================
-      // 宝鸡 — 家乡
-      // ==========================================
-      '610000_baoji': {
-        name: '宝鸡',
-        tag: '陕西省',
-        role: '炎帝故里 · 青铜器之乡',
-        bio: [
-          '宝鸡是我的家乡。但我其实并没有去过太多地方，所以我一直以为宝鸡很小，连宝鸡有四区八县都是偶尔刷到的，这也印证了“你所经历的才是你的世界”，至少之前我以为宝鸡只有三个区。',
-          '我的童年到初中都算平平淡淡，本是内向的性子，遇上几个朋友后变得开朗，也许这也算不得平淡了。',
-          '不过高中时期是属实不同。也许是因为高考这柄剑悬在头上，在这里遇到的人、发生的事，都会让人记忆犹新。',
-          '我还记得，入学、网课、每次运动会、每次音乐节......',
-          '在高中遇见了很多让我珍视的人，其中有些人虽然已经不再经常联系，但改变了我，变成了我的一部分和我走下去；有些人依旧在我的生活里，陪伴我成长，我很感激他们。',
-          '啧，现在的我和那时的我以及不再是同一个人，所以回顾过去，真的有不少遗憾，唉，真想发明时光机。',
-          '上了大学后故乡只剩下冬夏，在冬天回去会觉得有点萧瑟，夏天回去会觉得有点闷热。远在杭州，我偶尔也会想念家乡，但更多时候是想念那些人和事了。',
-          '其实来到了杭州这种大都市后，才真正意识到宝鸡的独特魅力。这也许就是宜居城市的含金量，若所求较少，完全可以安安稳稳的待在这里，过平平淡淡幸幸福福的一生；若所求较多，也可以出走他乡，一展拳脚，而宝鸡永远是那个温暖的港湾，等你回去。'      
-        ],
-        stats: [
-          { v: '20+年', l: '生活时长' },
-          { v: '家乡', l: '城市标签' },
-          { v: '擀面皮', l: '最深印象' },
-          { v: '★★★★★', l: '推荐指数' }
-        ],
-        highlights: [
-          '青铜器博物院——何尊与最早的中国',
-          '秦岭太白山的四季风光',
-          '石鼓山公园俯瞰渭河',
-          '人民街的擀面皮和臊子面',
-          '炎帝陵追寻华夏根脉',
-          '金台观的古建与暮鼓晨钟',
-          '宝鸡中学的朋友与回忆',
-        ]
-      },
+    // Load data from JSON files
+    const [TRAVELED_CITIES, CITY_PROFILES, DISTRICT_NOTES, WISHLIST_IMPRESSIONS, CITY_IMAGES, DISTRICT_IMAGES] = await Promise.all([
+      loadTraveledCities(),
+      fetch('admin/data/city-profiles.json').then(r => r.json()),
+      fetch('admin/data/district-notes.json').then(r => r.json()),
+      fetch('admin/data/wishlist-impressions.json').then(r => r.json()),
+      fetch('admin/data/city-images.json').then(r => r.json()),
+      fetch('admin/data/district-images.json').then(r => r.json()),
+    ]);
 
-      // ==========================================
-      // 咸阳
-      // ==========================================
-      '610000_xianyang': {
-        name: '咸阳',
-        tag: '陕西省',
-        role: '大秦帝都 · 千年古渡',
-        bio: [
-          '其实我来这里只是来做寒实的，顺便吃顿饭。',
-          '咸阳西一出来，让我感到有些诧异——和我想的不太一样。这里没有太多现代化的高楼，反而有一种质朴的气质。',
-          '咸阳没有西安一样四通八达的地铁居然，这么多年西咸一体化，我把它当成了西安一样的国际化大都市了，但其实没有。咸阳更像是一个安静的老者，虽然经历了千年的风雨，但依然保持着自己的节奏和韵味。',
-          '所以我打车到了寒实的学校后，结束后又打车回到了咸阳西。在咸阳西还遇到了一些小插曲，稀里糊涂带乘高铁带来咸阳的充电宝现在却没法进高铁站，最后只能寄回来。',
-          '待了一天匆匆离开，又从咸阳西到了西安北，在西安玩了一天。也许有时间我会再来，好好看看这座古老的城市。'
-        ],
-        stats: [
-          { v: '1', l: '旅行天数' },
-          { v: '2025', l: '旅行时间' },
-          { v: '秦文化', l: '最深印象' },
-          { v: '★★★★', l: '推荐指数' }
-        ],
-        highlights: [
-          '咸阳宫遗址公园感受秦风',
-          '严格的高铁安检',
-          '寒实那个学校的学生知道我的高中母校，情理之中意料之外',
-        ]
-      },
-
-      // ==========================================
-      // 西安
-      // ==========================================
-      '610000_xian': {
-        name: '西安',
-        tag: '陕西省',
-        role: '十三朝古都 · 梦回长安',
-        bio: [
-          '第一次来还是六年级毕业，2018年，那时候连身份证都没有，买票要家长带着户口本，那时候实体票还没有消失，检票还会在票上剪一剪刀，所以我那时候想：原来检票也是剪票啊。',
-          '那次在西安没有多待，去看了看钟楼和大雁塔，逛了逛回民街，中午吃的不是特色的羊肉泡馍，反而是牛肉拉面。那时候的我没有想到，以后我会经常往返这里。',
-          '后来上了大学，西安作为交通枢纽，是我即将到家的标志。我最熟悉的是从机场到市区的这一段路，地铁要在地上走好一段路，看着外面的田野，我会有种安心的感觉，我想因为这意味着离家近了。',
-          '可是西安的景点，我是没怎么去过的。和朋友出来玩，多半是在商场一类的地方，玩玩剧本杀吃吃饭什么的。',
-          '令我印象最深的事是有一次我要返校了，于是叫上还没返校的朋友来西安，去见见我们在西安的朋友，其实那天也没什么特别的安排，吃了个饭，最后公式化的找了个绿叶电竞，其实我们那个包厢有床，但是到最后我们也没有怎么睡。凌晨四点，我匆匆离开，坐了机场大巴赶到机场。那天让我难忘是因为那天打破了很多原本的计划，但是毫无疑问的是我随机应变最终还是顺利返校了。',
-          '印象最深地方的是西安国际医学中心地铁站，印象最深的是西工长校外的一家饭馆，量大实惠美味。',
-          '千年古都，常来长安，千年古都，常来长安，可我还会常来吗？maybe',
-      ],
-        stats: [
-          { v: '多次', l: '旅行次数' },
-          { v: '2026', l: '最近到访' },
-          { v: '钟楼', l: '最深印象' },
-          { v: '★★★★★', l: '推荐指数' }
-        ],
-        highlights: [
-          '在城墙上骑行一圈俯瞰古都',
-          '兵马俑——世界第八大奇迹',
-          '回民街从街头吃到巷尾',
-          '大唐不夜城的盛唐夜色',
-          '大雁塔广场的音乐喷泉',
-          '陕西历史博物馆的国宝巡礼',
-          ''
-        ]
-      },
-
-      // ==========================================
-      // 北京
-      // ==========================================
-      '110000_beijing': {
-        name: '北京',
-        tag: '北京市',
-        role: '帝都风华 · 古今交汇',
-        impression: '故宫的红墙黄瓦、胡同里的京腔京韵、三里屯的潮流气息——北京把古老和现代揉在一起，厚重但不沉重，来过就会记住。',
-        bio: [
-          '我似乎没有什么首都情节，从小没有什么我一定要去北京的念想。这次来是中考结束后，被告知和宝中提前签约过了所以学校带着我们来北京游学。',
-          '我那时候真以为是去学习的，甚至带了一支笔，不过这没有冲散刚刚中考完我的兴奋，所以这一晚上我玩了个通宵，第二天迷迷糊糊到了宝中。',
-          '有一个小组只有一个男生，所以我被调到那个组了，因为我认识的朋友在别的组，所以我也无所谓，再加上实在太困，也无所谓了。',
-          '高铁上睡了一路。',
-          '那时候比较沉默寡言，这也是“一个莫比斯”称呼的来源，是的，那时候我没有想到与我一个组的同学，后面会成为我特别重要的人。',
-        ],
-        stats: [
-          { v: '5天', l: '旅行天数' },
-          { v: '2021', l: '旅行时间' },
-          { v: '风', l: '最深印象' },
-          { v: '★★★★★', l: '推荐指数' }
-        ],
-        highlights: [
-          '故宫博物院——穿越六百年的震撼',
-          '八达岭长城的壮阔山河',
-          '南锣鼓巷与后海的胡同漫游',
-          '颐和园的皇家园林之美',
-          '798艺术区的当代艺术气息'
-        ]
-      },
-
-      // ==========================================
-      // 上海
-      // ==========================================
-      '310000_shanghai': {
-        name: '上海',
-        tag: '上海市',
-        role: '东方明珠 · 摩登之城',
-        impression: '外滩的万国建筑与陆家嘴的摩天楼隔江对望，法租界的梧桐树下藏着咖啡馆和旧时光——上海一面是未来，一面是故事。',
-        bio: [
-          '国际化大都市，毫无疑问。',
-          '不过来这么多次，我也知道上海也有它的烟火气和人情味。',
-          ''
-        ],
-        stats: [
-          { v: '多次', l: '旅行次数' },
-          { v: '2026', l: '最近到访' },
-          { v: '外滩', l: '最深印象' },
-          { v: '★★★★★', l: '推荐指数' }
-        ],
-        highlights: [
-          '外滩夜景——浦江两岸的光影对话',
-          '法租界梧桐树下的City Walk',
-          '南京路步行街的繁华热闹',
-          '豫园与城隍庙的老上海味道',
-          '陆家嘴三件套仰望天空',
-          '田子坊弄堂里的文艺小店'
-        ]
-      },
-
-      // ==========================================
-      // 苏州
-      // ==========================================
-      '320000_suzhou': {
-        name: '苏州',
-        tag: '江苏省',
-        role: '园林之城 · 人间天堂',
-        bio: [
-          '"上有天堂，下有苏杭"——来到苏州才知道这句话不夸张。苏州的美是精致的、含蓄的，像一幅慢慢展开的水墨画。',
-          '拙政园里转一圈，你会明白为什么古人愿意花几百年雕琢一座园子。一步一景，每个窗框出去都是一幅画。平江路上走走停停，听一曲评弹，时间都慢了下来。',
-          '苏州的温柔不止在园林，还在街头巷尾的一碗苏式汤面里。这座城市的节奏让人想留下来。'
-        ],
-        stats: [
-          { v: '3天', l: '旅行天数' },
-          { v: '2025', l: '旅行时间' },
-          { v: '园林', l: '最深印象' },
-          { v: '★★★★★', l: '推荐指数' }
-        ],
-        highlights: [
-          '拙政园——中国园林的巅峰之作',
-          '平江路的评弹与水巷慢时光',
-          '虎丘塔下的千年传说',
-          '山塘街的夜色与红灯笼',
-          '苏州博物馆——贝聿铭的几何诗',
-          '一碗正宗的苏式汤面'
-        ]
-      },
-
-      // ==========================================
-      // 南京
-      // ==========================================
-      '320000_nanjing': {
-        name: '南京',
-        tag: '江苏省',
-        role: '六朝古都 · 钟山风雨',
-        bio: [
-          '南京是一座有故事的城市。六朝的烟雨、民国的风云，都沉淀在秦淮河的柔波里和梧桐大道的落叶中。',
-          '走在中山陵的台阶上，两旁的雪松像列队的卫兵，庄严肃穆。夫子庙的夜晚热闹非凡，秦淮河上的灯火让人想起金陵十三钗的旧梦。',
-          '南京的梧桐树是我对这座城市最深的记忆。秋天的时候，满城金黄，这座古都显露出它最温柔的一面。'
-        ],
-        stats: [
-          { v: '3天', l: '旅行天数' },
-          { v: '2025', l: '旅行时间' },
-          { v: '梧桐', l: '最深印象' },
-          { v: '★★★★★', l: '推荐指数' }
-        ],
-        highlights: [
-          '中山陵——三百九十二级台阶的庄严',
-          '秦淮河夜游看桨声灯影',
-          '南京博物院的民国风情展',
-          '明孝陵的神道石刻',
-          '颐和路的梧桐大道漫步',
-          '老门东的鸭血粉丝汤'
-        ]
-      },
-
-      // ==========================================
-      // 青岛
-      // ==========================================
-      '370000_qingdao': {
-        name: '青岛',
-        tag: '山东省',
-        role: '滨海琴岛 · 帆船之都',
-        bio: [
-          '青岛是一座被海风吹透的城市。一下火车，空气中就带着淡淡的咸味和啤酒的麦香。红瓦绿树、碧海蓝天——这八个字是对青岛最准确的描述。',
-          '走在八大关的林荫道上，德式老建筑掩映在梧桐树下，恍惚间以为到了欧洲。栈桥延伸到海里，回望老城区，整个城市像一幅油画。',
-          '来了青岛怎么能不喝啤酒？拎一袋散装青岛啤酒，坐在海边吹着海风——这就是青岛人的日常，也是游客最羡慕的体验。'
-        ],
-        stats: [
-          { v: '5天', l: '旅行天数' },
-          { v: '2025', l: '旅行时间' },
-          { v: '大海', l: '最深印象' },
-          { v: '★★★★★', l: '推荐指数' }
-        ],
-        highlights: [
-          '八大关——万国建筑博览会',
-          '栈桥回澜阁看老城天际线',
-          '青岛啤酒博物馆喝一杯原浆',
-          '崂山——海上第一名山',
-          '信号山公园俯瞰红瓦绿树',
-          '台东夜市的海鲜与烟火气'
-        ]
-      },
-
-      // ==========================================
-      // 嘉兴
-      // ==========================================
-      '330000_jiaxing': {
-        name: '嘉兴',
-        tag: '浙江省',
-        role: '江南水乡 · 红色印记',
-        bio: [
-          '嘉兴给人的第一印象是安静。没有杭州的拥挤，没有上海的喧闹，这座江南小城有自己的节奏。',
-          '南湖上的烟雨楼静静矗立，这里是红船起航的地方。但嘉兴不只有红色旅游——西塘古镇的桨声灯影、乌镇的戏剧与艺术，都让这座城市足够有味。',
-          '嘉兴粽子全国闻名，端午前后满城粽叶飘香。这座城市的魅力在于它的低调——你来过就会发现，江南不只是苏杭，嘉兴自有风景。'
-        ],
-        stats: [
-          { v: '3天', l: '旅行天数' },
-          { v: '2026', l: '旅行时间' },
-          { v: '南湖', l: '最深印象' },
-          { v: '★★★★', l: '推荐指数' }
-        ],
-        highlights: [
-          '南湖红船与烟雨楼',
-          '西塘古镇的水乡夜色',
-          '乌镇的戏剧与当代艺术',
-          '月河历史街区的老嘉兴',
-          '嘉兴粽子——舌尖上的江南',
-          '南湖天地的新旧交融'
-        ]
-      },
-
-      // ==========================================
-      // 杭州 — 上学的地方
-      // ==========================================
-      '330000_hangzhou': {
-        name: '杭州',
-        tag: '浙江省',
-        role: '人间天堂 · 求学之城',
-        bio: [
-          '杭州是我上大学的地方，也是除了家乡之外待得最久的城市。西湖的美不是惊心动魄的那种，而是每天路过都会多看两眼的温柔。',
-          '在这里上学最大的幸福就是——周末骑个共享单车就能到西湖边，绕湖一圈，看看雷峰塔的剪影，吹吹苏堤的晚风，所有压力都散了。',
-          '杭州的四季各有风景：春天的樱花和龙井新茶，夏天的曲院风荷，秋天的满陇桂雨，冬天的断桥残雪。在这座城市里生活，本身就是一种幸运。',
-          '龙井村里喝一杯明前茶，灵隐寺里听一声钟响——杭州教会我的不只是书本上的知识，还有生活本身的诗意。'
-        ],
-        stats: [
-          { v: '2年', l: '生活时长' },
-          { v: '2024-now', l: '大学时光' },
-          { v: '西湖', l: '最深印象' },
-          { v: '★★★★★', l: '推荐指数' }
-        ],
-        highlights: [
-          '西湖一圈——苏堤春晓到雷峰夕照',
-          '灵隐寺的晨钟与禅意',
-          '龙井村品一杯正宗明前龙井',
-          '法喜寺的五百罗汉与素斋',
-          '钱塘江边的骑行与日落',
-          '南宋御街与河坊街的市井烟火'
-        ]
-      },
-    };
-
-    // =============================================
-    // District Notes — 直辖市的区级足迹（简洁印象）
-    // =============================================
-    const DISTRICT_NOTES = {
-      '110000_haidian':{
-       name: '海淀',
-       tag: '北京市 · 海淀区',
-       impression: [
-             '早就听说中国教育看北京，北京教育看海淀。果真如此，让人梦寐以求的高校，这里数不胜数。各种研究所也云集于此，学术氛围浓厚。',
-             '我们在这里参观了中国科学院植物研究所，听了几场讲座。',
-             '还参观了北京大学的某个门（因为疫情没能进去），时值六月，空气里充满了毕业季的气息。当时读不懂空气中的欣喜和不舍，现在想来，我毕业时大抵也是如此。',
-             '后来在植物研究所听一个叫夏天的学长带我们云游清华园，我那时候觉得他很有意思，但我不喜欢他，因为当时的我是个以貌取人的小孩。'
-        ]
-    },
-      '110000_dongcheng': {
-        name: '东城',
-        tag: '北京市 · 东城区',
-        impression: [
-          '在这里写下你在东城的经历...'
-        ]
-      },
-      '110000_xicheng': {
-        name: '西城',
-        tag: '北京市 · 西城区',
-        impression: [
-          '在这里写下你在西城的经历...'
-        ]
-      },
-      '110000_shijingshan': {
-        name: '石景山',
-        tag: '北京市 · 石景山区',
-        impression: [
-          '在这里写下你在石景山的经历...'
-        ]
-      },
-      '110000_yanqing': {
-        name: '延庆',
-        tag: '北京市 · 延庆区',
-        impression: [
-          '在这里写下你在延庆的经历...'
-        ]
-      },
-      '310000_minhang': {
-        name: '闵行',
-        tag: '上海市 · 闵行区',
-        impression: [
-          '在这里写下你在闵行的经历...'
-        ]
-      },
-      '310000_huangpu': {
-        name: '黄浦',
-        tag: '上海市 · 黄浦区',
-        impression: [
-          '在这里写下你在黄浦的经历...'
-        ]
-      },
-      '310000_songjiang': {
-        name: '松江',
-        tag: '上海市 · 松江区',
-        impression: [
-          '在这里写下你在松江的经历...'
-        ]
-      },
-    };
-
-    // =============================================
-    // Wishlist Impressions — 还没去过的地方，先留个印象
-    // =============================================
-    const WISHLIST_IMPRESSIONS = {
-      '510000_成都': {
-        name: '成都',
-        tag: '四川省',
-        role: '天府之国 · 尚未踏足',
-        impression: '我一定会来的，我对这里早已充满憧憬。我听说四川人直率而松弛，我也有四川的朋友，所以我对这里很感兴趣。'
-      },
-      '500000_重庆': {
-        name: '重庆',
-        tag: '重庆市',
-        role: '山城雾都 · 尚未踏足',
-        impression: '想吃正宗重庆火锅'
-      },
-      '440000_广州': {
-        name: '广州',
-        tag: '广东省',
-        role: '千年商都 · 尚未踏足',
-        impression: '尝尝凉茶'
-      },
-      '440000_深圳': {
-        name: '深圳',
-        tag: '广东省',
-        role: '创新之城 · 尚未踏足',
-        impression: '听说这里有只企鹅很狂'
-      },
-      '420000_武汉': {
-        name: '武汉',
-        tag: '湖北省',
-        role: '九省通衢 · 尚未踏足',
-        impression: '来这里过个早呢'
-      },
-      '430000_长沙': {
-        name: '长沙',
-        tag: '湖南省',
-        role: '星城 · 尚未踏足',
-        impression: '看万山红遍，层林尽染；漫江碧透，百舸争流。'
-      },
-      '350000_厦门': {
-        name: '厦门',
-        tag: '福建省',
-        role: '海上花园 · 尚未踏足',
-        impression: '看看那年你看的风景'
-      },
-      '530000_大理': {
-        name: '大理',
-        tag: '云南省',
-        role: '风花雪月 · 尚未踏足',
-        impression: '“大理的夜，真的很冷”'
-      },
-      '120000_天津': {
-        name: '天津',
-        tag: '天津市',
-        role: '津门故里 · 尚未踏足',
-        impression: '我最好的朋友在这里读书'
-      }
-    };
-
-    // HTML entity escape — prevent XSS from URL params
     function escapeHTML(str) {
       if (!str) return '';
       return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -589,7 +205,21 @@
     let data = CITY_PROFILES[id] || DISTRICT_NOTES[id] || WISHLIST_IMPRESSIONS[id];
     const isDistrict = !CITY_PROFILES[id] && DISTRICT_NOTES[id];
     const isWishlist = !CITY_PROFILES[id] && !DISTRICT_NOTES[id] && WISHLIST_IMPRESSIONS[id];
-    const isGeneric = !data && cityName;
+    // 足迹数据作为 fallback
+    const isTraveled = !data && !isDistrict && !isWishlist && TRAVELED_CITIES[id];
+    if (isTraveled) {
+      const t = TRAVELED_CITIES[id];
+      data = {
+        name: t.name,
+        tag: t.province || '',
+        role: '',
+        impression: t.days ? `${t.year || ''}年到访，停留${t.days}天` : '',
+        bio: [],
+        stats: [],
+        highlights: [],
+      };
+    }
+    const isGeneric = !data && !isTraveled && cityName;
     const app = document.getElementById('app');
 
     const formatImpression = (imp) => {
@@ -631,22 +261,37 @@
           </div>
         </div>
       `;
-    } else if (isWishlist || isDistrict) {
-      // Wishlist city — simple impression layout
+    } else if (isWishlist || isDistrict || isTraveled) {
+      // Wishlist/district/traveled city — simple impression layout
       document.title = 'MOB1S | ' + data.name;
+      const galleryImages = isDistrict ? (DISTRICT_IMAGES[id] || []) : (CITY_IMAGES[id] || []);
+      const gallerySrc = isDistrict ? 'district' : 'city';
       app.innerHTML = `
         <div class="city-hero">
           <span class="city-tag">${data.tag}</span>
           <h1 class="city-name-cn">${data.name}</h1>
-          <p class="city-role">${data.role}</p>
+          ${data.role ? `<p class="city-role">${data.role}</p>` : ''}
         </div>
         <div class="city-content">
           <div class="city-grid" style="grid-template-columns:1fr;">
-            <div class="impression-section">
-              <h2>// 我的印象</h2>
-              <div class="impression-card">${formatImpression(data.impression)}</div>
+            <div class="${isDistrict ? 'impression-section experience-section' : 'impression-section'}">
+              <h2>// ${isDistrict ? '我的经历' : '我的印象'}</h2>
+              <div class="${isDistrict ? 'impression-card experience-card' : 'impression-card'}">${formatImpression(data.impression)}</div>
             </div>
           </div>
+          ${galleryImages.length > 0 ? `
+          <div class="gallery-entry">
+            <h2>// 图片回忆</h2>
+            <div class="gallery-thumbs">
+              ${galleryImages.slice(0, 3).map(img => `
+                <div class="thumb-item">
+                  <img src="${img.src}" alt="${img.desc}" loading="lazy">
+                </div>
+              `).join('')}
+            </div>
+            <a href="gallery.html?src=${gallerySrc}&id=${id}" class="gallery-link">查看全部 →</a>
+          </div>
+          ` : ''}
         </div>
       `;
     } else {
@@ -693,6 +338,19 @@
               <div class="highlight-list">${highlightHTML}</div>
             </div>
           </div>
+          ${(CITY_IMAGES[id] && CITY_IMAGES[id].length > 0) ? `
+          <div class="gallery-entry">
+            <h2>// 图片回忆</h2>
+            <div class="gallery-thumbs">
+              ${CITY_IMAGES[id].slice(0, 3).map(img => `
+                <div class="thumb-item">
+                  <img src="${img.src}" alt="${img.desc}" loading="lazy">
+                </div>
+              `).join('')}
+            </div>
+            <a href="gallery.html?src=city&id=${id}" class="gallery-link">查看全部 →</a>
+          </div>
+          ` : ''}
         </div>
       `;
     }

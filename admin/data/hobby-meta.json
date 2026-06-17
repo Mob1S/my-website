@@ -1,0 +1,22 @@
+{
+  "hobby-f1": {
+    "name": "FORMULA 1",
+    "tag": "HBY-001 · WEEKLY",
+    "backUrl": "index.html#hobbies"
+  },
+  "hobby-basketball": {
+    "name": "BASKETBALL",
+    "tag": "HBY-002 · DAILY",
+    "backUrl": "index.html#hobbies"
+  },
+  "hobby-cs": {
+    "name": "COUNTER STRIKE",
+    "tag": "HBY-003 · ACTIVE",
+    "backUrl": "index.html#hobbies"
+  },
+  "hobby-fitness": {
+    "name": "FITNESS",
+    "tag": "HBY-004 · DAILY",
+    "backUrl": "index.html#hobbies"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "hobby-f1": [
+    {
+      "src": "images/hobbies/f1/卡丁车体验.jpg",
+      "desc": "卡丁车体验"
+    },
+    {
+      "src": "images/hobbies/f1/飞驰的感觉.jpg",
+      "desc": "飞驰的感觉"
+    }
+  ],
+  "hobby-basketball": [],
+  "hobby-cs": [
+    {
+      "src": "images/hobbies/cs/肾上腺飙升的1v5.jpg",
+      "desc": "肾上腺飙升的1v5"
+    }
+  ],
+  "hobby-fitness": []
+}

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MOB1S | Gallery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --carbon: #0a0a0c;
+      --neon: #bfff00;
+      --neon-dim: rgba(191, 255, 0, 0.12);
+      --titanium-dim: #5a5a66;
+      --white: #e8e8ec;
+      --white-dim: #90909a;
+      --border-hairline: rgba(255, 255, 255, 0.05);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --font-display: 'Orbitron', system-ui, sans-serif;
+      --font-mono: 'Space Mono', 'Consolas', monospace;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; background: var(--carbon); }
+    body { font-family: var(--font-mono); color: var(--white); -webkit-font-smoothing: antialiased; }
+    a { color: inherit; text-decoration: none; }
+
+    /* 顶栏 */
+    .top-bar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.8rem 2rem;
+      background: rgba(10,10,12,0.95); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-hairline);
+    }
+    .back-link { color: var(--neon); font-size: 0.7rem; letter-spacing: 0.1em; font-weight: 700; }
+    .top-brand { font-family: var(--font-display); font-size: 0.8rem; font-weight: 800; }
+    .top-brand .accent { color: var(--neon); }
+    .top-tag { font-size: 0.55rem; letter-spacing: 0.15em; color: var(--titanium-dim); }
+
+    /* 标题 */
+    .gallery-header {
+      position: fixed; top: 42px; left: 0; right: 0; z-index: 100;
+      text-align: center; padding: 0.5rem 2rem 0.2rem; pointer-events: none;
+    }
+    .gallery-tag { font-size: 0.55rem; letter-spacing: 0.2em; color: var(--neon); border: 1px solid var(--neon-dim); padding: 0.25rem 0.8rem; display: inline-block; }
+    .gallery-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 900; margin: 0.25rem 0 0; }
+
+    /* 轨道 */
+    .h-scroll-track {
+      position: fixed; top: 85px; bottom: 36px; left: 0;
+      display: flex; align-items: center; gap: 3rem;
+      padding: 0 12vw; will-change: transform;
+    }
+
+    /* 卡片 */
+    .gallery-card {
+      flex: 0 0 auto; cursor: pointer;
+      transform-origin: center center; will-change: transform;
+    }
+    .gallery-card:hover { z-index: 10; }
+    .card-inner {
+      position: relative; overflow: hidden;
+      background: rgba(191,255,0,0.03);
+      border: 1px solid rgba(191,255,0,0.12); border-radius: 2px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      transition: border-color 0.4s, box-shadow 0.4s;
+    }
+    .gallery-card:hover .card-inner {
+      border-color: rgba(191,255,0,0.4);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 20px rgba(191,255,0,0.1);
+    }
+    .card-inner img { width: 100%; display: block; object-fit: cover; }
+    .card-inner .card-desc { font-size: 0.7rem; color: var(--white-dim); padding: 0.5rem 0.7rem; letter-spacing: 0.02em; }
+
+    /* 底栏 */
+    .bottom-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: center; gap: 1.5rem;
+      padding: 0.4rem 1rem;
+      background: rgba(10,10,12,0.92); border-top: 1px solid var(--border-hairline);
+      font-size: 0.55rem; color: var(--titanium-dim);
+    }
+    .bottom-bar .brand { font-family: var(--font-display); font-size: 0.6rem; font-weight: 800; color: var(--white); }
+    .bottom-bar .brand .accent { color: var(--neon); }
+    .bottom-bar a { color: var(--titanium-dim); }
+    .bottom-bar a:hover { color: var(--neon); }
+    .progress { display: flex; align-items: center; gap: 0.8rem; }
+    .progress-bar { width: 100px; height: 2px; background: var(--border-subtle); border-radius: 1px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--neon); width: 0%; box-shadow: 0 0 6px rgba(191,255,0,0.4); }
+
+    .empty-state { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--titanium-dim); font-size: 0.85rem; }
+    .empty-state a { color: var(--neon); font-weight: 700; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a id="backLink" href="index.html" class="back-link">&larr; BACK</a>
+    <span class="top-brand">MOB<span class="accent">1S</span></span>
+    <span class="top-tag">图片画廊</span>
+  </div>
+  <div class="gallery-header" id="galleryHeader" style="display:none;">
+    <span class="gallery-tag" id="headerTag"></span>
+    <h1 class="gallery-title" id="headerTitle"></h1>
+  </div>
+  <div id="app"></div>
+  <div class="bottom-bar">
+    <span class="brand">MOB<span class="accent">1S</span></span>
+    <div class="progress" id="progressBar" style="display:none;">
+      <span id="pText">0 / 0</span>
+      <div class="progress-bar"><div class="progress-fill" id="pFill"></div></div>
+    </div>
+    <a href="https://beian.miit.gov.cn/" target="_blank">浙ICP备2026040720号</a>
+    <span>&copy; 2026</span>
+  </div>
+
+  <script>
+    Promise.all([
+      fetch('admin/data/city-images.json').then(r => r.json()),
+      fetch('admin/data/hobby-images.json').then(r => r.json()),
+      fetch('admin/data/person-images.json').then(r => r.json()),
+      fetch('admin/data/hobby-meta.json').then(r => r.json()),
+      fetch('admin/data/person-meta.json').then(r => r.json()),
+      fetch('admin/data/district-images.json').then(r => r.json()),
+      fetch('admin/data/district-notes.json').then(r => r.json()),
+    ]).then(([CITY_IMAGES, HOBBY_IMAGES, PERSON_IMAGES, HOBBY_META, PERSON_META, DISTRICT_IMAGES, DISTRICT_NOTES]) => {
+
+    const CITY_META = {
+      '610000_baoji':    { name: '宝鸡', tag: '陕西省 · 家乡', backUrl: 'city-detail.html?id=610000_baoji' },
+      '610000_xianyang': { name: '咸阳', tag: '陕西省', backUrl: 'city-detail.html?id=610000_xianyang' },
+      '610000_xian':     { name: '西安', tag: '陕西省', backUrl: 'city-detail.html?id=610000_xian' },
+      '110000_beijing':  { name: '北京', tag: '北京市', backUrl: 'city-detail.html?id=110000_beijing' },
+      '310000_shanghai': { name: '上海', tag: '上海市', backUrl: 'city-detail.html?id=310000_shanghai' },
+      '320000_suzhou':   { name: '苏州', tag: '江苏省', backUrl: 'city-detail.html?id=320000_suzhou' },
+      '320000_nanjing':  { name: '南京', tag: '江苏省', backUrl: 'city-detail.html?id=320000_nanjing' },
+      '370000_qingdao':  { name: '青岛', tag: '山东省', backUrl: 'city-detail.html?id=370000_qingdao' },
+      '330000_jiaxing':  { name: '嘉兴', tag: '浙江省', backUrl: 'city-detail.html?id=330000_jiaxing' },
+      '330000_hangzhou': { name: '杭州', tag: '浙江省 · 求学之城', backUrl: 'city-detail.html?id=330000_hangzhou' },
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const src = params.get('src'), id = params.get('id');
+    let meta = null, images = null;
+
+    if (src === 'city' && id && CITY_META[id])       { meta = CITY_META[id];   images = CITY_IMAGES[id] || []; }
+    else if (src === 'hobbies' && id && HOBBY_META[id]) { meta = HOBBY_META[id]; images = HOBBY_IMAGES[id] || []; }
+    else if (src === 'person' && id && PERSON_META[id]) { meta = PERSON_META[id]; images = PERSON_IMAGES[id] || []; }
+    else if (src === 'district' && id && DISTRICT_NOTES[id]) {
+      const d = DISTRICT_NOTES[id];
+      meta = { name: d.name, tag: d.tag, backUrl: 'city-detail.html?id=' + id };
+      images = DISTRICT_IMAGES[id] || [];
+    }
+
+    const app = document.getElementById('app');
+    if (!meta || !images || images.length === 0) {
+      app.innerHTML = `<div class="empty-state"><p>暂无图片</p><p style="margin-top:0.5rem;font-size:0.75rem;">图片将在未来添加</p><a href="${meta ? meta.backUrl : 'index.html'}">&larr; 返回</a></div>`;
+      return;
+    }
+
+    document.title = 'MOB1S | ' + meta.name;
+    document.getElementById('backLink').href = meta.backUrl;
+    document.getElementById('galleryHeader').style.display = '';
+    document.getElementById('progressBar').style.display = '';
+    document.getElementById('headerTag').textContent = meta.tag;
+    document.getElementById('headerTitle').textContent = meta.name;
+
+    // =============================================
+    // 伪随机
+    // =============================================
+    function sr(i) { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
+
+    // =============================================
+    // 生成卡片
+    // =============================================
+    const cardsMeta = images.map((img, i) => {
+      const rot = (sr(i) - 0.5) * 18;           // -9° ~ 9°
+      const offy = (sr(i + 50) - 0.5) * 100;   // -50px ~ 50px
+      const w = 220 + sr(i + 100) * 160;        // 220~380px
+      return { rot, offy, w, img, i };
+    });
+
+    app.innerHTML = `<div class="h-scroll-track" id="track">${
+      cardsMeta.map(c => `
+        <div class="gallery-card" data-rot="${c.rot}" data-offy="${c.offy}" style="width:${c.w}px; transform:rotate(${c.rot}deg) translateY(${c.offy}px);">
+          <div class="card-inner">
+            <img src="${c.img.src}" alt="${c.img.desc}" loading="lazy">
+            ${c.img.desc ? `<div class="card-desc">${c.img.desc}</div>` : ''}
+          </div>
+        </div>
+      `).join('')
+    }</div>`;
+
+    // =============================================
+    // Stage 1: 整体从右侧滑入
+    // =============================================
+    const track = document.getElementById('track');
+    const cards = track.querySelectorAll('.gallery-card');
+    const pText = document.getElementById('pText');
+    const pFill = document.getElementById('pFill');
+
+    // 轨道起始位置：屏幕右侧外
+    let trackOffset = window.innerWidth;
+    let entryDone = false; // 入场完成前锁定滚动
+    track.style.transform = `translateX(${trackOffset}px)`;
+
+    // 入场动画：从右滑到原位，1.8秒，弹性
+    function entrySlide() {
+      const start = performance.now();
+      const from = trackOffset;
+      const to = 0;
+      const duration = 1800;
+
+      function step(now) {
+        const elapsed = now - start;
+        const p = Math.min(elapsed / duration, 1);
+        // 弹性缓动
+        const ease = p < 1 ? 1 - Math.pow(1 - p, 3) * Math.cos(p * Math.PI * 2.5) : 1;
+        trackOffset = from + (to - from) * ease;
+        track.style.transform = `translateX(${trackOffset}px)`;
+        if (p < 1) requestAnimationFrame(step);
+        else {
+          trackOffset = 0;
+          entryDone = true;
+          posX = 0;
+          targetX = 0;
+          calcMax();
+          startScrollAnim();
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    // 延迟 100ms 后开始入场
+    setTimeout(entrySlide, 100);
+
+    // =============================================
+    // Stage 2 & 3: 滚动驱动 + 浮动
+    // =============================================
+    let posX = 0, targetX = 0, maxScroll = 0;
+    let hovering = false;
+
+    function calcMax() {
+      maxScroll = Math.max(track.scrollWidth - window.innerWidth + 200, 0);
+    }
+    calcMax();
+    window.addEventListener('resize', calcMax);
+    track.querySelectorAll('img').forEach(img => img.addEventListener('load', calcMax));
+
+    // wheel → 水平位移
+    window.addEventListener('wheel', e => {
+      e.preventDefault();
+      if (!entryDone) return;
+      targetX = Math.max(0, Math.min(targetX + e.deltaY * 0.8, maxScroll));
+    }, { passive: false });
+
+    // 触摸
+    let touchY = 0;
+    window.addEventListener('touchstart', e => { touchY = e.touches[0].clientY; }, { passive: true });
+    window.addEventListener('touchmove', e => {
+      if (!entryDone) return;
+      const dy = touchY - e.touches[0].clientY;
+      targetX = Math.max(0, Math.min(targetX + dy * 2, maxScroll));
+      touchY = e.touches[0].clientY;
+    }, { passive: true });
+
+    // 主动画循环（入场完成后启动）
+    function startScrollAnim() {
+      function animate(t) {
+        posX += (targetX - posX) * 0.05;
+        track.style.transform = `translateX(${-posX}px)`;
+
+        const progress = maxScroll > 0 ? posX / maxScroll : 0;
+        pText.textContent = `${Math.max(1, Math.round(progress * images.length))} / ${images.length}`;
+        pFill.style.width = (progress * 100) + '%';
+
+        // 卡片浮动
+        cards.forEach((card, i) => {
+          if (card._hovering) return;
+          const baseRot = parseFloat(card.dataset.rot);
+          const baseOffy = parseFloat(card.dataset.offy);
+          const speed = 0.0004 + (i % 5) * 0.0001;
+          const phase = i * 2.1;
+          const floatY = Math.sin(t * speed + phase) * 8;
+          const floatRot = Math.cos(t * speed * 0.7 + phase) * 1.5;
+          card.style.transform = `rotate(${baseRot + floatRot}deg) translateY(${baseOffy + floatY}px)`;
+          card.style.transition = 'none';
+        });
+
+        requestAnimationFrame(animate);
+      }
+      requestAnimationFrame(animate);
+    }
+
+    // hover: 摆正
+    cards.forEach(card => {
+      card._hovering = false;
+      card.addEventListener('mouseenter', () => {
+        card._hovering = true;
+        card.style.transform = 'rotate(0deg) translateY(0px) scale(1.06)';
+        card.style.transition = 'transform 0.4s cubic-bezier(0.23,1,0.32,1)';
+      });
+      card.addEventListener('mouseleave', () => {
+        card._hovering = false;
+      });
+    });
+
+    // 鼠标视差
+    cards.forEach(card => {
+      const inner = card.querySelector('.card-inner');
+      card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+        inner.style.transform = `perspective(600px) rotateY(${x*6}deg) rotateX(${-y*6}deg)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        inner.style.transform = 'perspective(600px) rotateY(0) rotateX(0)';
+        inner.style.transition = 'transform 0.3s ease-out';
+      });
+      card.addEventListener('mouseenter', () => { inner.style.transition = 'none'; });
+    });
+
+    }).catch(err => {
+      console.error('[Gallery] Error:', err);
+      document.getElementById('app').innerHTML = '<div class="empty-state"><p>加载失败</p><p style="font-size:0.7rem;color:#666;">' + err.message + '</p></div>';
+    });
+  </script>
+</body>
+</html>

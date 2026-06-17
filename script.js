@@ -848,7 +848,7 @@ async function initMyMap() {
   var MAP_VIEWBOX = mod.MAP_VIEWBOX;
   var INSET = mod.INSET_VIEWBOX;
 
-  var TRAVELED_CITIES = mod.TRAVELED_CITIES;
+  var TRAVELED_CITIES = await mod.loadTraveledCities();
   var svg = document.getElementById('chinaMap');
   var tooltip = document.getElementById('mapTooltip');
   if (!svg) return;

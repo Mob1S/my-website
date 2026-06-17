@@ -328,6 +328,7 @@
         <div class="nav-item" data-module="images" onclick="switchModule('images')">图片</div>
         <div class="nav-item" data-module="hobbies" onclick="switchModule('hobbies')">爱好</div>
         <div class="nav-item" data-module="people" onclick="switchModule('people')">人物</div>
+        <div class="nav-item" data-module="site" onclick="switchModule('site')">站点设置</div>
       </nav>
 
       <main class="content">
@@ -386,6 +387,15 @@
           <div class="entry-list" id="peopleList"></div>
           <div id="peopleForm"></div>
         </div>
+
+        <!-- Module: Site Config -->
+        <div class="module" id="mod-site">
+          <div class="section-header">
+            <span class="section-index">SECTOR 06</span>
+            <span class="section-title">SITE_CONFIG</span>
+          </div>
+          <div id="siteConfigForm"></div>
+        </div>
       </main>
     </div>
   </div>
@@ -412,6 +422,7 @@
     let personImagesData = {};
     let hobbyMetaData = {};
     let personMetaData = {};
+    let siteConfigData = {};
 
     // Selected keys
     let selectedTraveled = null;
@@ -490,6 +501,7 @@
         apiFetch('/api/hobby-meta'),
         apiFetch('/api/person-meta'),
         apiFetch('/api/district-images'),
+        apiFetch('/api/site-config'),
       ]);
       provinces = results[0] || [];
       traveledData = results[1] || {};
@@ -504,12 +516,14 @@
       hobbyMetaData = results[10] || {};
       personMetaData = results[11] || {};
       districtImagesData = results[12] || {};
+      siteConfigData = results[13] || {};
 
       renderTraveled();
       renderProfiles();
       renderImages();
       renderHobbies();
       renderPeople();
+      renderSiteConfig();
       startClock();
     }
 
@@ -1300,6 +1314,42 @@
       div.innerHTML = `<input class="ach-item" placeholder="新成就..." title="成就">
         <button class="stat-remove" style="position:absolute;top:0;right:0" onclick="this.parentElement.remove()">&times;</button>`;
       document.getElementById('pp_ach_list').appendChild(div);
+    }
+
+    // --- Site Config ---
+    function renderSiteConfig() {
+      const credits = siteConfigData.credits || {};
+      document.getElementById('siteConfigForm').innerHTML = `
+        <div class="card">
+          <div class="card-header">
+            <span class="card-key">CREDITS</span>
+            <div class="card-actions">
+              <button class="btn btn-primary" onclick="saveSiteConfig()">SAVE</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>致谢内容</label>
+            <textarea id="sc_credits_text" rows="8" placeholder="输入致谢文字...">${esc(credits.text || '')}</textarea>
+          </div>
+        </div>`;
+    }
+
+    async function saveSiteConfig() {
+      try {
+        const credits = { text: gv('sc_credits_text') };
+        console.log('[SiteConfig] Saving:', credits);
+        const res = await apiFetch('/api/site-config/credits', { method: 'PUT', body: credits });
+        console.log('[SiteConfig] Response:', res);
+        if (res && res.error) {
+          toast('ERROR: ' + res.error, true);
+          return;
+        }
+        siteConfigData.credits = credits;
+        toast('SAVED');
+      } catch (e) {
+        console.error('[SiteConfig] Save failed:', e);
+        toast('SAVE FAILED: ' + e.message, true);
+      }
     }
 
     // --- Utilities ---

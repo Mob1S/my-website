@@ -30,6 +30,7 @@ detail.html         — 人物详情页
 map-detail.html     — 地图详情页
 city-detail.html    — 城市详情页
 gallery.html        — 画廊浏览页
+credits.html        — 致谢页面
 purpose-about.html  — 关于页面
 purpose-ai.html     — AI 页面
 purpose-hobbies.html — 爱好页面
@@ -49,7 +50,8 @@ admin/
     ├── person-images.json    — 人物画廊图片
     ├── hobby-images.json     — 爱好画廊图片
     ├── hobby-meta.json       — 爱好元数据
-    └── person-meta.json      — 人物元数据
+    ├── person-meta.json      — 人物元数据
+    └── site-config.json      — 站点配置（致谢等）
 
 data/
 ├── 110000_full.json  (北京)

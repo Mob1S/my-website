@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MOB1S | 致谢</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --carbon: #0a0a0c;
+      --carbon-light: #111115;
+      --carbon-card: #14141a;
+      --neon: #bfff00;
+      --neon-dim: rgba(191, 255, 0, 0.12);
+      --neon-glow: rgba(191, 255, 0, 0.35);
+      --neon-ghost: rgba(191, 255, 0, 0.06);
+      --titanium: #a0a0aa;
+      --titanium-dim: #5a5a66;
+      --white: #e8e8ec;
+      --white-dim: #90909a;
+      --border-hairline: rgba(255, 255, 255, 0.05);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --font-display: 'Orbitron', system-ui, sans-serif;
+      --font-mono: 'Space Mono', 'Consolas', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-mono);
+      background: var(--carbon);
+      color: var(--white);
+      line-height: 1.8;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Carbon overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.05;
+      background:
+        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255,255,255,0.008) 2px, rgba(255,255,255,0.008) 4px),
+        radial-gradient(ellipse at 50% 0%, rgba(191,255,0,0.04) 0%, transparent 60%);
+    }
+
+    /* Top bar */
+    .top-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 1.5rem;
+      background: rgba(10, 10, 12, 0.92);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-hairline);
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+    }
+
+    .bar-back {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--white-dim);
+      text-decoration: none;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      transition: color 0.3s;
+    }
+
+    .bar-back:hover { color: var(--neon); }
+
+    .bar-back svg {
+      width: 14px; height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .bar-brand {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      color: var(--white);
+    }
+
+    .bar-brand .accent { color: var(--neon); }
+
+    /* Content */
+    .credits-page {
+      position: relative;
+      z-index: 1;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 6rem 2rem 4rem;
+    }
+
+    .credits-header {
+      margin-bottom: 3rem;
+    }
+
+    .credits-title {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+    }
+
+    .credits-subtitle {
+      font-size: 0.65rem;
+      color: var(--titanium-dim);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .credits-divider {
+      width: 40px;
+      height: 2px;
+      background: var(--neon);
+      margin: 1.5rem 0;
+      box-shadow: 0 0 8px var(--neon-glow);
+    }
+
+    .credits-body {
+      font-size: 0.85rem;
+      color: var(--titanium);
+      white-space: pre-wrap;
+      line-height: 2;
+    }
+
+    .credits-body:empty::before {
+      content: '暂无致谢内容';
+      color: var(--titanium-dim);
+      opacity: 0.5;
+    }
+
+    /* Footer */
+    .credits-footer {
+      margin-top: 4rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-hairline);
+      text-align: center;
+    }
+
+    .credits-footer a {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: var(--titanium-dim);
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+
+    .credits-footer a:hover { color: var(--neon); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .credits-page { padding: 5rem 1.25rem 3rem; }
+      .credits-title { font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <a href="index.html" class="bar-back">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      BACK
+    </a>
+    <span class="bar-brand">MOB<span class="accent">1S</span></span>
+  </div>
+
+  <!-- Credits Content -->
+  <div class="credits-page">
+    <div class="credits-header">
+      <h1 class="credits-title">致谢</h1>
+      <p class="credits-subtitle">ACKNOWLEDGMENTS</p>
+      <div class="credits-divider"></div>
+    </div>
+    <div class="credits-body" id="creditsBody"></div>
+    <div class="credits-footer">
+      <a href="index.html">← 返回首页</a>
+    </div>
+  </div>
+
+  <script>
+    fetch('admin/data/site-config.json')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var credits = data.credits || {};
+        var el = document.getElementById('creditsBody');
+        if (el && credits.text) {
+          el.textContent = credits.text;
+        }
+      })
+      .catch(function() {});
+  </script>
+</body>
+</html>

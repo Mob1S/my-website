@@ -1478,6 +1478,33 @@ html::-webkit-scrollbar {
   letter-spacing: 0.03em;
 }
 
+.footer-credits {
+  width: 100%;
+  text-align: center;
+  padding: 0.4rem 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.footer-credits-link {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--titanium-dim);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+  border-bottom: 1px solid var(--border-hairline);
+  padding-bottom: 0.1rem;
+}
+
+.footer-credits-link:hover {
+  color: var(--neon);
+  border-bottom-color: var(--neon);
+}
+
 /* =============================================
    RESPONSIVE
    ============================================= */

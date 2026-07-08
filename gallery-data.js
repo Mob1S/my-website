@@ -3,9 +3,12 @@
 // 数据由 admin/ 开发面板管理
 // =============================================
 
+var DATA_VERSION = '{{VERSION}}';
+var V = DATA_VERSION;
+
 export async function loadCityImages() {
   try {
-    const res = await fetch('admin/data/city-images.json');
+    const res = await fetch('admin/data/city-images.json?v='+V, { cache: 'no-store' });
     return await res.json();
   } catch (e) {
     console.warn('Failed to load city-images.json');
@@ -15,7 +18,7 @@ export async function loadCityImages() {
 
 export async function loadHobbyImages() {
   try {
-    const res = await fetch('admin/data/hobby-images.json');
+    const res = await fetch('admin/data/hobby-images.json?v='+V, { cache: 'no-store' });
     return await res.json();
   } catch (e) {
     console.warn('Failed to load hobby-images.json');
@@ -25,7 +28,7 @@ export async function loadHobbyImages() {
 
 export async function loadPersonImages() {
   try {
-    const res = await fetch('admin/data/person-images.json');
+    const res = await fetch('admin/data/person-images.json?v='+V, { cache: 'no-store' });
     return await res.json();
   } catch (e) {
     console.warn('Failed to load person-images.json');
@@ -35,7 +38,7 @@ export async function loadPersonImages() {
 
 export async function loadHobbyMeta() {
   try {
-    const res = await fetch('admin/data/hobby-meta.json');
+    const res = await fetch('admin/data/hobby-meta.json?v='+V, { cache: 'no-store' });
     return await res.json();
   } catch (e) {
     console.warn('Failed to load hobby-meta.json');
@@ -45,7 +48,7 @@ export async function loadHobbyMeta() {
 
 export async function loadPersonMeta() {
   try {
-    const res = await fetch('admin/data/person-meta.json');
+    const res = await fetch('admin/data/person-meta.json?v='+V, { cache: 'no-store' });
     return await res.json();
   } catch (e) {
     console.warn('Failed to load person-meta.json');
@@ -55,7 +58,7 @@ export async function loadPersonMeta() {
 
 export async function loadDistrictImages() {
   try {
-    const res = await fetch('admin/data/district-images.json');
+    const res = await fetch('admin/data/district-images.json?v='+V, { cache: 'no-store' });
     return await res.json();
   } catch (e) {
     console.warn('Failed to load district-images.json');

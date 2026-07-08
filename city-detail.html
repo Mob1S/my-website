@@ -184,14 +184,17 @@
     import { loadTraveledCities } from './map-data.js';
 
 
+    var DATA_VERSION = '{{VERSION}}';
+    var V = DATA_VERSION;
+
     // Load data from JSON files
     const [TRAVELED_CITIES, CITY_PROFILES, DISTRICT_NOTES, WISHLIST_IMPRESSIONS, CITY_IMAGES, DISTRICT_IMAGES] = await Promise.all([
       loadTraveledCities(),
-      fetch('admin/data/city-profiles.json').then(r => r.json()),
-      fetch('admin/data/district-notes.json').then(r => r.json()),
-      fetch('admin/data/wishlist-impressions.json').then(r => r.json()),
-      fetch('admin/data/city-images.json').then(r => r.json()),
-      fetch('admin/data/district-images.json').then(r => r.json()),
+      fetch('admin/data/city-profiles.json?v='+V, { cache: 'no-store' }).then(r => r.json()),
+      fetch('admin/data/district-notes.json?v='+V, { cache: 'no-store' }).then(r => r.json()),
+      fetch('admin/data/wishlist-impressions.json?v='+V, { cache: 'no-store' }).then(r => r.json()),
+      fetch('admin/data/city-images.json?v='+V, { cache: 'no-store' }).then(r => r.json()),
+      fetch('admin/data/district-images.json?v='+V, { cache: 'no-store' }).then(r => r.json()),
     ]);
 
     function escapeHTML(str) {

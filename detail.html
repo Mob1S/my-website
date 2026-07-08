@@ -359,15 +359,17 @@
   </main>
 
   <script type="module">
+    var DATA_VERSION = '{{VERSION}}';
+    var V = DATA_VERSION;
 
     // Load data from JSON files
     const [PROFILES, HOBBY_STORIES, PERSON_IMAGES, HOBBY_IMAGES, PERSON_META, HOBBY_META] = await Promise.all([
-      fetch('admin/data/person-profiles.json').then(r => r.json()),
-      fetch('admin/data/hobby-profiles.json').then(r => r.json()),
-      fetch('admin/data/person-images.json').then(r => r.json()),
-      fetch('admin/data/hobby-images.json').then(r => r.json()),
-      fetch('admin/data/person-meta.json').then(r => r.json()),
-      fetch('admin/data/hobby-meta.json').then(r => r.json()),
+      fetch('admin/data/person-profiles.json?v='+V, { cache: 'no-store' }).then(r => r.json()),
+      fetch('admin/data/hobby-profiles.json?v='+V, { cache: 'no-store' }).then(r => r.json()),
+      fetch('admin/data/person-images.json?v='+V, { cache: 'no-store' }).then(r => r.json()),
+      fetch('admin/data/hobby-images.json?v='+V, { cache: 'no-store' }).then(r => r.json()),
+      fetch('admin/data/person-meta.json?v='+V, { cache: 'no-store' }).then(r => r.json()),
+      fetch('admin/data/hobby-meta.json?v='+V, { cache: 'no-store' }).then(r => r.json()),
     ]);
 
     const params = new URLSearchParams(window.location.search);

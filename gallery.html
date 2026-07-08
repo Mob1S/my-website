@@ -115,14 +115,16 @@
   </div>
 
   <script>
+    var DATA_VERSION = '{{VERSION}}';
+    var V = DATA_VERSION;
     Promise.all([
-      fetch('admin/data/city-images.json').then(r => r.json()),
-      fetch('admin/data/hobby-images.json').then(r => r.json()),
-      fetch('admin/data/person-images.json').then(r => r.json()),
-      fetch('admin/data/hobby-meta.json').then(r => r.json()),
-      fetch('admin/data/person-meta.json').then(r => r.json()),
-      fetch('admin/data/district-images.json').then(r => r.json()),
-      fetch('admin/data/district-notes.json').then(r => r.json()),
+      fetch('admin/data/city-images.json?v='+V, { cache: 'no-store' }).then(r => r.json()),
+      fetch('admin/data/hobby-images.json?v='+V, { cache: 'no-store' }).then(r => r.json()),
+      fetch('admin/data/person-images.json?v='+V, { cache: 'no-store' }).then(r => r.json()),
+      fetch('admin/data/hobby-meta.json?v='+V, { cache: 'no-store' }).then(r => r.json()),
+      fetch('admin/data/person-meta.json?v='+V, { cache: 'no-store' }).then(r => r.json()),
+      fetch('admin/data/district-images.json?v='+V, { cache: 'no-store' }).then(r => r.json()),
+      fetch('admin/data/district-notes.json?v='+V, { cache: 'no-store' }).then(r => r.json()),
     ]).then(([CITY_IMAGES, HOBBY_IMAGES, PERSON_IMAGES, HOBBY_META, PERSON_META, DISTRICT_IMAGES, DISTRICT_NOTES]) => {
 
     const CITY_META = {
@@ -179,15 +181,21 @@
       return { rot, offy, w, img, i };
     });
 
+    var VISIBLE_COUNT = 8;
     app.innerHTML = `<div class="h-scroll-track" id="track">${
-      cardsMeta.map(c => `
-        <div class="gallery-card" data-rot="${c.rot}" data-offy="${c.offy}" style="width:${c.w}px; transform:rotate(${c.rot}deg) translateY(${c.offy}px);">
+      cardsMeta.map(function(c, i) {
+        var imgHTML = i < VISIBLE_COUNT
+          ? '<img src="' + c.img.src + '" alt="' + (c.img.desc || '') + '" loading="lazy">'
+          : '<div class="card-placeholder" data-src="' + c.img.src + '" data-alt="' + (c.img.desc || '') + '" style="width:100%; aspect-ratio:4/3; background:rgba(191,255,0,0.03);"></div>';
+        return `
+        <div class="gallery-card" data-rot="${c.rot}" data-offy="${c.offy}" data-idx="${i}" style="width:${c.w}px; transform:rotate(${c.rot}deg) translateY(${c.offy}px);">
           <div class="card-inner">
-            <img src="${c.img.src}" alt="${c.img.desc}" loading="lazy">
-            ${c.img.desc ? `<div class="card-desc">${c.img.desc}</div>` : ''}
+            ${imgHTML}
+            ${c.img.desc ? '<div class="card-desc">' + c.img.desc + '</div>' : ''}
           </div>
         </div>
-      `).join('')
+      `;
+      }).join('')
     }</div>`;
 
     // =============================================
@@ -197,6 +205,30 @@
     const cards = track.querySelectorAll('.gallery-card');
     const pText = document.getElementById('pText');
     const pFill = document.getElementById('pFill');
+
+    // =============================================
+    // Progressive image loading with IntersectionObserver
+    // =============================================
+    if ('IntersectionObserver' in window) {
+      var imgObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            var placeholder = entry.target.querySelector('.card-placeholder');
+            if (placeholder) {
+              var img = document.createElement('img');
+              img.src = placeholder.dataset.src;
+              img.alt = placeholder.dataset.alt || '';
+              img.loading = 'lazy';
+              placeholder.parentNode.replaceChild(img, placeholder);
+              img.addEventListener('load', calcMax);
+            }
+            imgObserver.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: '400px' });
+
+      cards.forEach(function(card) { imgObserver.observe(card); });
+    }
 
     // 轨道起始位置：屏幕右侧外
     let trackOffset = window.innerWidth;

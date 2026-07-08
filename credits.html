@@ -198,7 +198,8 @@
   </div>
 
   <script>
-    fetch('admin/data/site-config.json')
+    var DATA_VERSION = '{{VERSION}}';
+    fetch('admin/data/site-config.json?v='+DATA_VERSION, { cache: 'no-store' })
       .then(function(r) { return r.json(); })
       .then(function(data) {
         var credits = data.credits || {};

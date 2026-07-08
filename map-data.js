@@ -16,11 +16,12 @@ export const INSET_VIEWBOX = { x: 680, y: 620, w: 200, h: 210 };
 // Add entries here as you write about cities you've been to
 
 // Traveled cities loaded from admin/data/traveled-cities.json
+var DATA_VERSION = '{{VERSION}}';
 export let TRAVELED_CITIES = {};
 
 export async function loadTraveledCities() {
   try {
-    const res = await fetch("admin/data/traveled-cities.json");
+    const res = await fetch("admin/data/traveled-cities.json?v=" + DATA_VERSION, { cache: 'no-store' });
     TRAVELED_CITIES = await res.json();
   } catch (e) {
     console.warn("Failed to load traveled-cities.json, using empty data");

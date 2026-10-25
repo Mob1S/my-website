@@ -129,7 +129,8 @@
   </main>
 
   <script type="module">
-    import { HOBBY_IMAGES, HOBBY_META } from './gallery-data.js';
+    import { loadHobbyImages, loadHobbyMeta } from './gallery-data.js';
+    const [HOBBY_IMAGES, HOBBY_META] = await Promise.all([loadHobbyImages(), loadHobbyMeta()]);
 
     const container = document.getElementById('hobbyGalleries');
 

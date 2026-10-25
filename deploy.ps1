@@ -1,192 +1,47 @@
-# =============================================
-# Mob1S Deploy Script
-# Usage:
-#   .\deploy.ps1              Prepare deploy package to deploy\out\
-#   .\deploy.ps1 -Upload user@host   SCP upload to server
-#   .\deploy.ps1 -Diff         Show files changed since last deploy
-# =============================================
+# Build and stage a frontend-only release. Mutable content and backend stay on server.
 param(
   [switch]$Upload,
   [string]$Server,
+  [string]$ServerRoot,
   [switch]$Diff
 )
-
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = 'Stop'
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-Set-Location $scriptDir
-
-# --- Config ---
-$deployDir = "deploy\out"
-$versionFile = "deploy\.version"
-$serverRoot = "/www/wwwroot/mob1s"
-
-# --- Deploy file list ---
-$deployFiles = @(
-  # Core pages
-  "index.html",
-  "style.css",
-  "script.js",
-  # Detail pages
-  "detail.html",
-  "city-detail.html",
-  "map-detail.html",
-  "gallery.html",
-  "credits.html",
-  # Purpose pages
-  "purpose-about.html",
-  "purpose-ai.html",
-  "purpose-hobbies.html",
-  "purpose-map.html",
-  # Other pages
-  "f1_preview.html",
-  "presentation.html",
-  # Data modules
-  "map-data.js",
-  "gallery-data.js",
-  # Assets
-  "F1_SVG_wb.svg",
-  # Admin panel
-  "admin\admin.html",
-  "admin\data\city-profiles.json",
-  "admin\data\city-images.json",
-  "admin\data\district-notes.json",
-  "admin\data\district-images.json",
-  "admin\data\wishlist-impressions.json",
-  "admin\data\person-profiles.json",
-  "admin\data\hobby-profiles.json",
-  "admin\data\person-images.json",
-  "admin\data\hobby-images.json",
-  "admin\data\person-meta.json",
-  "admin\data\hobby-meta.json",
-  "admin\data\traveled-cities.json",
-  "admin\data\site-config.json",
-  # Production server
-  "server.js",
-  # Anime.js
-  "anime-4.4.1\dist\bundles\anime.esm.min.js",
-  # Beian
-  "备案图标.png"
-)
-
-# --- Version ---
-$today = Get-Date -Format "yyyy-MM-dd"
-
-# --- Diff mode ---
+Set-Location -LiteralPath $scriptDir
 if ($Diff) {
-  Write-Host "Files changed since last deploy:" -ForegroundColor Cyan
-  if (Test-Path $versionFile) {
-    $lastDeploy = Get-Content $versionFile -Raw
-    Write-Host "  Last deploy: $lastDeploy"
-  } else {
-    Write-Host "  No previous deploy record"
-  }
-  Write-Host ""
-  Write-Host "Current deploy file list:" -ForegroundColor Yellow
-  foreach ($f in $deployFiles) {
-    if (Test-Path $f) {
-      $hash = (Get-FileHash $f -Algorithm MD5).Hash
-      Write-Host "  $f  [$hash]"
-    } else {
-      Write-Host "  $f  [MISSING]" -ForegroundColor Red
+  git diff --stat
+  exit $LASTEXITCODE
+}
+if ($Upload -and (-not $Server -or -not $ServerRoot)) {
+  throw 'Upload requires -Server user@host and an explicitly verified -ServerRoot /absolute/site/path.'
+}
+if ($Upload -and ($ServerRoot -notmatch '^/[a-zA-Z0-9_./-]+$' -or $ServerRoot -eq '/' -or $ServerRoot -match '\.\.')) {
+  throw 'ServerRoot must be an absolute site directory without traversal or shell characters.'
+}
+& npm.cmd run build
+if ($LASTEXITCODE -ne 0) { throw 'Build failed. No deployment files were changed.' }
+$release = Get-Date -Format 'yyyyMMdd-HHmmss-fff'
+$stage = Join-Path $scriptDir "deploy/releases/$release"
+New-Item -ItemType Directory -Path $stage | Out-Null
+Get-ChildItem -LiteralPath (Join-Path $scriptDir 'dist') -Force | Copy-Item -Destination $stage -Recurse
+Write-Host "Frontend release: $stage"
+Write-Host 'admin/data, images, server source and environment files are excluded.'
+if ($Upload) {
+  $backup = "$ServerRoot/.frontend-backups/$release"
+  & ssh $Server "mkdir -p '$ServerRoot/assets' '$ServerRoot/admin' '$ServerRoot/data' '$backup/admin'; if [ -f '$ServerRoot/index.html' ]; then cp '$ServerRoot/index.html' '$backup/index.html'; fi; if [ -f '$ServerRoot/admin/admin.html' ]; then cp '$ServerRoot/admin/admin.html' '$backup/admin/admin.html'; fi"
+  if ($LASTEXITCODE -ne 0) { throw 'Remote directory preparation failed.' }
+  # Retain old hashed assets. Upload the HTML entry last so readers see complete assets.
+  foreach ($item in Get-ChildItem -LiteralPath $stage | Where-Object Name -ne 'index.html') {
+    if (-not $item.PSIsContainer) {
+      & ssh $Server "if [ -f '$ServerRoot/$($item.Name)' ]; then cp '$ServerRoot/$($item.Name)' '$backup/$($item.Name)'; fi"
+      if ($LASTEXITCODE -ne 0) { throw "Remote backup failed: $($item.Name)" }
     }
+    & scp -r $item.FullName "${Server}:$ServerRoot/"
+    if ($LASTEXITCODE -ne 0) { throw "Upload failed: $($item.Name). Existing index.html retained." }
   }
-  exit 0
-}
-
-# --- Prepare deploy package ---
-Write-Host "=== Mob1S Deploy ===" -ForegroundColor Cyan
-Write-Host "Version: $today"
-Write-Host ""
-
-# Clean output dir
-if (Test-Path $deployDir) {
-  Remove-Item -Recurse -Force $deployDir
-}
-New-Item -ItemType Directory -Force $deployDir | Out-Null
-
-# Copy files with version injection
-$copied = 0
-$injected = 0
-$missing = @()
-
-foreach ($f in $deployFiles) {
-  $src = Join-Path $scriptDir $f
-  $dst = Join-Path $deployDir $f
-  $dstParent = Split-Path $dst -Parent
-
-  if (-not (Test-Path $src)) {
-    $missing += $f
-    continue
-  }
-
-  # Ensure destination directory exists
-  if (-not (Test-Path $dstParent)) {
-    New-Item -ItemType Directory -Force $dstParent | Out-Null
-  }
-
-  # For HTML/JS files, inject version
-  $ext = [System.IO.Path]::GetExtension($f)
-  if ($ext -in '.html', '.js') {
-    $content = Get-Content $src -Raw -Encoding UTF8
-    if ($content -match '\{\{VERSION\}\}') {
-      $content = $content -replace '\{\{VERSION\}\}', $today
-      $injected++
-    }
-    # Write with UTF8 no BOM (matching typical web server expectations)
-    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-    [System.IO.File]::WriteAllText($dst, $content, $utf8NoBom)
-  } else {
-    Copy-Item $src $dst -Force
-  }
-
-  $copied++
-  Write-Host "  OK  $f" -ForegroundColor Green
-}
-
-# Report
-Write-Host ""
-Write-Host "Copied: $copied files" -ForegroundColor Green
-if ($injected -gt 0) {
-  Write-Host "Version injected: $injected files -> '$today'" -ForegroundColor Yellow
-}
-if ($missing.Count -gt 0) {
-  Write-Host "Missing: $($missing -join ', ')" -ForegroundColor Red
-}
-
-# Save version
-$today | Out-File $versionFile -Encoding UTF8
-
-# --- Upload mode ---
-if ($Upload -and $Server) {
-  Write-Host ""
-  Write-Host "Uploading to $Server ..." -ForegroundColor Cyan
-  # Upload files individually to preserve directory structure
-  Push-Location $deployDir
-  try {
-    # Create tar archive and pipe via SSH
-    $tarFile = "..\deploy.tar"
-    if (Test-Path $tarFile) { Remove-Item $tarFile -Force }
-
-    # Use SCP for individual files (more reliable on Windows)
-    Get-ChildItem -Recurse -File | ForEach-Object {
-      $relPath = $_.FullName.Substring((Get-Location).Path.Length + 1) -replace '\\', '/'
-      $remotePath = "$serverRoot/$relPath"
-      Write-Host "  Uploading: $relPath"
-      scp $_.FullName "${Server}:${remotePath}"
-    }
-    Write-Host ""
-    Write-Host "Upload complete!" -ForegroundColor Green
-    Write-Host "NOTE: You may need to restart the server: pm2 restart mob1s" -ForegroundColor Yellow
-  } finally {
-    Pop-Location
-  }
-} elseif ($Upload) {
-  Write-Host "Usage: .\deploy.ps1 -Upload user@your-server" -ForegroundColor Yellow
-  Write-Host "Deploy package prepared in: $deployDir" -ForegroundColor Cyan
-  Write-Host "You can also manually upload the deploy\out\ folder via Baota panel."
-} else {
-  Write-Host ""
-  Write-Host "Deploy package prepared in: $deployDir" -ForegroundColor Cyan
-  Write-Host "Run with -Upload user@host to SCP to server,"
-  Write-Host "  or manually upload deploy\out\ folder via Baota panel."
+  & scp (Join-Path $stage 'index.html') "${Server}:$ServerRoot/index.html.new"
+  if ($LASTEXITCODE -ne 0) { throw 'Entry upload failed.' }
+  & ssh $Server "mv '$ServerRoot/index.html.new' '$ServerRoot/index.html'"
+  if ($LASTEXITCODE -ne 0) { throw 'Entry activation failed.' }
+  Write-Host "Published. Previous entry: $backup/index.html; previous hashed assets retained."
 }

@@ -23,8 +23,13 @@ images/
 ecosystem.config.js
 nginx.conf
 setup-nginx.sh
-package.json
-package-lock.json
+dist/
+.migration-baseline/
+test-results/
+deploy/releases/
+deploy/out/
+deploy/.version
+deploy/*.tar
 
 # ========== 开发文档 ==========
 docs/

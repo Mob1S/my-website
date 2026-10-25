@@ -340,7 +340,12 @@ app.post('/api/chat', async (req, res) => {
 // ============================================================
 // Static files & SPA fallback — 必须在 API 路由之后
 // ============================================================
-app.use(express.static('.', {
+const path = require('node:path');
+const fs = require('node:fs');
+const frontendRoot = fs.existsSync(path.join(__dirname, 'dist/index.html')) ? path.join(__dirname, 'dist') : __dirname;
+app.use('/admin/data', express.static(path.join(__dirname, 'admin/data'), { etag: false, maxAge: 0, setHeaders: res => res.setHeader('Cache-Control', 'no-store') }));
+app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use(express.static(frontendRoot, {
   setHeaders: (res, filePath) => {
     if (filePath.endsWith('.json')) {
       res.setHeader('Cache-Control', 'no-store');
@@ -348,7 +353,8 @@ app.use(express.static('.', {
   },
 }));
 app.get('*', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
+  if (path.extname(req.path)) return res.status(404).send('Not found');
+  res.sendFile(path.join(frontendRoot, 'index.html'));
 });
 
 // ============================================================

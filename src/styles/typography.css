@@ -1,0 +1,61 @@
+/* Rounded display forms and natural prose; mono remains for telemetry and code. */
+body {
+  font-weight: 400;
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+}
+
+button, input { font-family: inherit; }
+
+.hero-title {
+  font-weight: 750;
+  letter-spacing: -0.045em;
+  line-height: 1.06;
+}
+
+.section-title {
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+}
+
+.panel-title { font-weight: 650; letter-spacing: -0.025em; }
+.driver-name { font-weight: 600; letter-spacing: 0; font-size: .84rem; }
+.driver-team { font-size: .68rem; letter-spacing: 0; }
+
+.intro-knockout, .chat-tagline {
+  font-family: var(--font-body);
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.65;
+}
+
+.intro-knockout .inline-accent { white-space: nowrap; }
+
+.intro-body, .panel-desc, .chat-desc {
+  font-size: .94rem;
+  line-height: 1.95;
+  letter-spacing: .015em;
+}
+
+.section-summary { font-size: .9rem; letter-spacing: .015em; }
+.chat-profiles-hint { font-size: .82rem; line-height: 1.9; }
+.hero-subtitle { font-family: var(--font-body); font-weight: 400; letter-spacing: .015em; }
+.hero-guide { font-weight: 400; letter-spacing: .025em; }
+.hero-actions a { font-weight: 500; letter-spacing: .02em; }
+
+.tel-label, .tel-value, .section-index, .panel-code, .panel-frequency,
+.tel-card-id, .tel-card-status, .bar-label, .bar-val, .sys-key, .sys-val,
+.footer-tag { font-weight: 500; }
+.tel-big-number { font-weight: 650; letter-spacing: -.035em; }
+.tel-big-number .unit { font-weight: 500; }
+.driver-num, .hud-value, .lucky-number { font-weight: 650; }
+.dot-label { font-family: var(--font-body); font-weight: 500; }
+.term-input, .term-send-btn { font-family: var(--font-mono); }
+.footer-icp { font-family: var(--font-body); letter-spacing: .015em; }
+.track-egg-modal p { font-family: var(--font-body); line-height: 1.9; }
+
+@media (max-width: 768px) {
+  .intro-body, .panel-desc, .chat-desc { font-size: .9rem; }
+  .section-summary { font-size: .84rem; }
+}
